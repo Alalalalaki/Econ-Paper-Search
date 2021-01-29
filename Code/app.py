@@ -80,11 +80,11 @@ def sidebar_info():
     """, unsafe_allow_html=True)
 
 
-if __name__ == '__main__':
+def main():
     sidebar_info()
 
     key_words = st.text_input('Keywords in Title and Abstract')
-    js = ['aer', 'jpe', 'qje', 'ecta', 'restud', 'aejmac', 'aejmic', 'aejapp', 'aejmac', 'aeri', 'restat', 'jeea', 'jep']
+    js = ['aer', 'jpe', 'qje', 'ecta', 'restud', 'aejmac', 'aejmic', 'aejapp', 'aejpol', 'aeri', 'restat', 'jeea', 'jep']
     journals = st.multiselect("Journals", js, js)
     c1, c2, c3, c4 = st.beta_columns(4)
     year_begin = c1.number_input('Year from', value=1980, min_value=1950, max_value=2020)
@@ -98,3 +98,7 @@ if __name__ == '__main__':
     df = load_data()
 
     search_keywords(key_words, journals, year_begin, year_end, sort_mth, max_show, data_load_state)
+
+if __name__ == '__main__':
+    main()
+
