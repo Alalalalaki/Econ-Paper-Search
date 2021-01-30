@@ -13,8 +13,12 @@ def scraping_list(session, code):
     base_url = f"https://ideas.repec.org/s/{code}.html"
 
     r = session.get(base_url).html
-    page_n = int(r.find(".pagination", first=True).find("li")[-2].text)
     paper_links = [i for d in r.find("#content>.panel-body") for i in d.absolute_links]
+    page = r.find(".pagination", first=True)
+    if not page:
+        return paper_links
+    else:
+        page_n = int(page.find("li")[-2].text)
 
     @retry(stop=stop_after_attempt(2), wait=wait_random(min=1, max=2))
     def get_links(url):
