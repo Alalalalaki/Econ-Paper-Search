@@ -110,9 +110,22 @@ def sidebar_info():
     """, unsafe_allow_html=True)
 
 
+def hide_right_menu():
+    # ref: https://discuss.streamlit.io/t/how-do-i-hide-remove-the-menu-in-production/362/3
+    hide_streamlit_style = """
+    <style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    </style>
+
+    """
+    st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
+
 def main():
     sidebar_info()
     # st.text(os.getcwd())
+    hide_right_menu()
 
     key_words = st.text_input('Keywords in Title and Abstract')
     js = ['aer', 'jpe', 'qje', 'ecta', 'restud',
