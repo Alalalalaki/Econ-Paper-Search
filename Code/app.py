@@ -13,7 +13,7 @@ st.set_page_config(page_title=None, page_icon=None, layout='centered', initial_s
 
 @st.cache
 def load_data():
-    df = pd.read_csv("../Data/papers.csv",
+    df = pd.read_csv("Data/papers.csv",
                      usecols=["title", "authors", "abstract", "url", "jel", "journal", "year"],
                      dtype={"year": "Int16"}
                      )
