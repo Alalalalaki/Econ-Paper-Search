@@ -100,7 +100,7 @@ def sidebar_info():
 
 def main():
     sidebar_info()
-    st.text(os.getcwd())
+    # st.text(os.getcwd())
 
     df = load_data()
     year_min = df.year.min()
