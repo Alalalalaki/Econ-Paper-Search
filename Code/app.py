@@ -51,7 +51,8 @@ def search_keywords(button_clicked, df, key_words, journals, year_begin, year_en
 
 def sidebar_info():
     st.sidebar.header("About")
-    st.sidebar.markdown("This is a simple app to search for economic papers by economic journals.")
+    st.sidebar.markdown(
+        "*This is a simple app to search for economic papers by economic journals. The data is gathered from RePEc.*")
     st.sidebar.header("Help")
     st.sidebar.subheader("Search Help")
     st.sidebar.markdown("""
