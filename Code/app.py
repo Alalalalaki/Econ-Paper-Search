@@ -96,6 +96,12 @@ def sidebar_info():
     restat: Review of Economics and Statistics<br>
     </div>
     """, unsafe_allow_html=True)
+    st.sidebar.header("Report Issues")
+    st.sidebar.markdown("""
+    <div style="font-size: small">
+    Report an issue or comment at <a href="https://github.com/Alalalalaki/Econ-Paper-Search">github repo</a>
+    </div>
+    """, unsafe_allow_html=True)
 
 
 def main():
@@ -114,7 +120,7 @@ def main():
           'jme', 'red', 'rand', 'rand', 'jole', 'jie', 'jpube', 'jde',
           'jeh', 'ehr', 'eeh',
           ]
-    journals = st.multiselect("Journals", js, js[:17])
+    journals = st.multiselect("Journals", js, js[:17])  # (see left sidebar for journal abbreviations)
     c1, c2, c3, c4 = st.beta_columns(4)
     year_begin = c1.number_input('Year from', value=1980, min_value=year_min, max_value=year_max)
     year_end = c2.number_input('Year to', value=year_max, min_value=year_min, max_value=year_max)
