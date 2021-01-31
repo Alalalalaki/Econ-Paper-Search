@@ -11,7 +11,7 @@ st.set_page_config(page_title=None, page_icon=None, layout='centered', initial_s
 """
 
 
-@st.cache
+@st.cache(show_spinner=False)
 def load_data():
     df = pd.read_csv("Data/papers.csv",
                      usecols=["title", "authors", "abstract", "url", "jel", "journal", "year"],
