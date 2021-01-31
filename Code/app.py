@@ -108,10 +108,6 @@ def main():
     sidebar_info()
     # st.text(os.getcwd())
 
-    df = load_data()
-    year_min = df.year.min()
-    year_max = df.year.max()
-
     key_words = st.text_input('Keywords in Title and Abstract')
     js = ['aer', 'jpe', 'qje', 'ecta', 'restud',
           'aejmac', 'aejmic', 'aejapp', 'aejpol', 'aeri',
@@ -121,6 +117,10 @@ def main():
           'jeh', 'ehr', 'eeh',
           ]
     journals = st.multiselect("Journals", js, js[:17])  # (see left sidebar for journal abbreviations)
+
+    year_min = 1900
+    year_max = 2021
+
     c1, c2, c3, c4 = st.beta_columns(4)
     year_begin = c1.number_input('Year from', value=1980, min_value=year_min, max_value=year_max)
     year_end = c2.number_input('Year to', value=year_max, min_value=year_min, max_value=year_max)
@@ -129,6 +129,8 @@ def main():
     button_clicked = st.button("Search")
 
     data_load_state = st.empty()
+
+    df = load_data()
 
     search_keywords(button_clicked, df, key_words, journals, year_begin, year_end, sort_mth, max_show, data_load_state)
 
