@@ -52,8 +52,13 @@ def search_keywords(button_clicked, df, key_words, journals, year_begin, year_en
 
 def sidebar_info():
     st.sidebar.header("About")
-    st.sidebar.markdown(
-        "*This is a simple app to search for economic papers by economic journals. The data is gathered from RePEc.*")
+    st.sidebar.markdown("""
+    <div style="font-size: small; font-style: italic">
+    This is a simple app to search for economic papers by economic journals.<br>
+    The data is gathered from RePEc.<br>
+    Author: Xuanli Zhu.<br>
+    </div>
+    """, unsafe_allow_html=True)
     st.sidebar.header("Help")
     st.sidebar.subheader("Search Help")
     st.sidebar.markdown("""
@@ -61,7 +66,8 @@ def sidebar_info():
     - The search looks for the papers with title and abstract that contain all of the keywords.<br>
     - The search does not distinguish between full words and parts of words.<br>
     - The search is case insensitive.<br>
-    - Use double-quotes to find exact phrases.<br>
+    - The search allows for using double-quotes to find exact phrases.<br>
+    - The search will return all papers of the selected journals if the keywords are blank.<br>
     </div>
     """, unsafe_allow_html=True)
     st.sidebar.subheader("Journal Abbreviations")
