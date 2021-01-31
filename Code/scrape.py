@@ -1,5 +1,4 @@
 import pandas as pd
-from pandas.core.frame import DataFrame
 from requests_html import HTMLSession
 import re
 from tqdm import tqdm
@@ -70,6 +69,14 @@ def scraping_paper(session, paper_links):
     return paper_info
 
 
+def clean_data(df):
+    df = df.copy()
+    df.abstract = df.abstract.replace(["No abstract is available for this item.", "(Copyright: Elsevier)"], pd.NaT)
+    df["year"] = df.bib_handle.str.extract("y:(\d+)").astype('float').astype('Int16')
+    df.authors = df.authors.str.replace("(\(.*\))", "").str.strip().str.replace("(\n+)", " & ")
+    return df
+
+
 def main():
     journals_map = {
         "aea/aecrev": "aer",
@@ -85,6 +92,7 @@ def main():
         "aea/aerins": 'aeri',
         "aea/jeclit": 'jel',
         "aea/jecper": 'jep',
+        "anr/reveco": 'are',
         "tpr/restat": 'restat',
         "tpr/jeurec": 'jeea',  # old
         "bla/jeurec": 'jeea',  # old
@@ -106,16 +114,18 @@ def main():
         "bla/ehsrev": 'ehr',
         "eee/exehis": 'eeh',
     }
+
+    # df = pd.DataFrame() # if scrape all
+    df = pd.read_pickle(output_path+"papers.pkl")  # if all some new
     session = HTMLSession()
-    df = pd.DataFrame()
     for key, value in journals_map.items():
         print(f"{value}:")
         paper_links = scraping_list(session, key)
         paper_info = scraping_paper(session, paper_links)
         _df = pd.DataFrame(paper_info).assign(journal=value)
         df = pd.concat([df, _df], ignore_index=True)
-    # df = df.assign(year=df.bib_handle.str.extract("y:(\d+)"))
-    df.to_pickle(output_path+"papers.pkl")
+
+    df.pipe(clean_data).to_csv(output_path+"papers.csv", index=False)
 
 
 if __name__ == '__main__':
