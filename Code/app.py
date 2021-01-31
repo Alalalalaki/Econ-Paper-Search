@@ -59,8 +59,7 @@ def sidebar_info():
     Author: Xuanli Zhu.<br>
     </div>
     """, unsafe_allow_html=True)
-    st.sidebar.header("Help")
-    st.sidebar.subheader("Search Help")
+    st.sidebar.header("Search Help")
     st.sidebar.markdown("""
     <div style="font-size: small">
     - The search looks for the papers with title and abstract that contain all of the keywords.<br>
@@ -70,7 +69,7 @@ def sidebar_info():
     - The search will return all papers of the selected journals if the keywords are blank.<br>
     </div>
     """, unsafe_allow_html=True)
-    st.sidebar.subheader("Journal Abbreviations")
+    st.sidebar.header("Journal Abbreviations")
     st.sidebar.markdown("""
     <div style="color: green; font-size: small">
     aejmic: AEJ Micro<br>
