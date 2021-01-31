@@ -1,6 +1,7 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
+import os
 
 st.set_page_config(page_title=None, page_icon=None, layout='centered', initial_sidebar_state='collapsed')
 
@@ -99,6 +100,7 @@ def sidebar_info():
 
 def main():
     sidebar_info()
+    print(os.getcwd())
 
     df = load_data()
     year_min = df.year.min()
