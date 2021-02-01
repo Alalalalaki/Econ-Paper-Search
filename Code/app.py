@@ -131,7 +131,7 @@ def main():
           'aejmac', 'aejmic', 'aejapp', 'aejpol', 'aeri',
           'restat', 'jeea', 'eer', 'ej',
           'jep', 'jel', 'are',
-          'jme', 'red', 'rand', 'rand', 'jole', 'jie', 'jpube', 'jde',
+          'jme', 'red', 'rand', 'jole', 'jie', 'jpube', 'jde',
           'jeh', 'ehr', 'eeh',
           ]
     journals = st.multiselect("Journals", js, js)  # js[:17]  # (see left sidebar for journal abbreviations)
