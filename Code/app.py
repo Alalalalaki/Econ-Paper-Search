@@ -131,10 +131,11 @@ def main():
           'aejmac', 'aejmic', 'aejapp', 'aejpol', 'aeri',
           'restat', 'jeea', 'eer', 'ej',
           'jep', 'jel', 'are',
-          'jme', 'red', 'rand', 'jole', 'jie', 'jpube', 'jde',
+          'jme', 'red', 'rand', 'jole',
+          'jie', 'jpube', 'jde',
           'jeh', 'ehr', 'eeh',
           ]
-    journals = st.multiselect("Journals", js, js)  # js[:17]  # (see left sidebar for journal abbreviations)
+    journals = st.multiselect("Journals", js, js[:21])  # (see left sidebar for journal abbreviations)
 
     year_min = 1900
     year_max = 2021
