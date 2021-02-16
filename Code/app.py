@@ -41,7 +41,8 @@ def search_keywords(button_clicked, df, key_words, journals, year_begin, year_en
         mask = np.vstack(masks).all(axis=0)
         dt = dt.loc[mask]
         sort_map = {'Most recent': 'year', 'Most cited': 'cite'}
-        dt = dt.sort_values([sort_map[sort_mth], 'journal'], ascending=[False, True]).reset_index()
+        # can use double sort: [sort_map[sort_mth], 'journal'], ascending=[False, True]
+        dt = dt.sort_values(sort_map[sort_mth], ascending=False).reset_index()
         data_load_state.markdown(f'**{dt.shape[0]} Papers Found**')
         show_papers(dt.head(max_show))
     # else:
