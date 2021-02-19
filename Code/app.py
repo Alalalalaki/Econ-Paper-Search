@@ -17,6 +17,10 @@ def load_data_cached(timestamp):
                      usecols=["title", "authors", "abstract", "url", "jel", "journal", "year"],
                      dtype={"year": "Int16"}
                      )
+    # drop book reviews (not perfect)
+    masks = [df.title.str.contains(i, case=False, regex=False) for i in ["pp.", " p."]]  # "pages," " pp "
+    mask = np.vstack(masks).any(axis=0)
+    df = df.loc[mask]
     return df
 
 
@@ -42,7 +46,7 @@ def search_keywords(button_clicked, df, key_words, journals, year_begin, year_en
         mask_year = (df.year >= year_begin) & (df.year <= year_end)
         dt = df.loc[mask_jounral & mask_year]
         info = dt.title + ' ' + dt.abstract.fillna('')
-        masks = [info.str.contains(s, case=False) for s in key_words]
+        masks = [info.str.contains(s, case=False, regex=False) for s in key_words]
         mask = np.vstack(masks).all(axis=0)
         dt = dt.loc[mask]
         sort_map = {'Most recent': 'year', 'Most cited': 'cite'}
