@@ -19,7 +19,7 @@ def load_data_cached(timestamp):
                      )
     # drop book reviews (not perfect)
     masks = [~df.title.str.contains(i, case=False, regex=False) for i in ["pp.", " p."]]  # "pages," " pp "
-    mask = np.vstack(masks).any(axis=0)
+    mask = np.vstack(masks).all(axis=0)
     df = df.loc[mask]
     return df
 
