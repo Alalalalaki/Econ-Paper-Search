@@ -17,11 +17,13 @@ def load_data_cached(timestamp):
                      usecols=["title", "authors", "abstract", "url", "jel", "journal", "year"],
                      dtype={"year": "Int16"}
                      ).drop_duplicates()
-
+    df = df[~df.year.isna()]
     # drop book reviews (not perfect)
     masks = [~df.title.str.contains(i, case=False, regex=False) for i in ["pp.", " p."]]  # "pages," " pp "
     mask = np.vstack(masks).all(axis=0)
     df = df.loc[mask]
+    # drop some duplicates due to weird strings in authors and abstract
+    df = df[~df.duplicated(['title', 'url']) | df.url.isna()]
     return df
 
 
