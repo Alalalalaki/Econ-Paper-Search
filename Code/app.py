@@ -16,7 +16,8 @@ def load_data_cached(timestamp):
     df = pd.read_csv("Data/papers.csv",
                      usecols=["title", "authors", "abstract", "url", "jel", "journal", "year"],
                      dtype={"year": "Int16"}
-                     )
+                     ).drop_duplicates()
+
     # drop book reviews (not perfect)
     masks = [~df.title.str.contains(i, case=False, regex=False) for i in ["pp.", " p."]]  # "pages," " pp "
     mask = np.vstack(masks).all(axis=0)
