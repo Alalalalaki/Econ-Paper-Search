@@ -32,6 +32,8 @@ def load_data():
 def show_papers(df):
     for index, row in df.iterrows():
         st.markdown(f'{index+1}.  [{row.title}]({row.url}). {row.authors}. {row.year}. {row.journal}.')
+        # with st.beta_expander(""):
+        #     st.markdown(row.abstract)
 
 
 def search_keywords(button_clicked, df, key_words, journals, year_begin, year_end, sort_mth, max_show, data_load_state):
