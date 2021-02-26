@@ -104,6 +104,7 @@ def sidebar_info():
     jel: The Journal of Economic History<br>
     jel: Journal of Economic Literature<br>
     jep: Journal of Economic Perspectives<br>
+    jet: Journal of Economic Theory<br>
     jie: Journal of International Economics<br>
     jole: Journal of Labor Economics<br>
     jme: Journal of Monetary Economics<br>
