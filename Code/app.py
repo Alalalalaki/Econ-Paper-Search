@@ -146,6 +146,7 @@ def main():
           'aejmac', 'aejmic', 'aejapp', 'aejpol', 'aeri',
           'restat', 'jeea', 'eer', 'ej',
           'jep', 'jel', 'are',
+          'jet',
           'jme', 'red', 'rand', 'jole',
           'jie', 'jpube', 'jde',
           'jeh', 'ehr', 'eeh',
