@@ -70,7 +70,7 @@ def sidebar_info():
     st.sidebar.markdown("""
     <div style="font-size: small; font-style: italic">
     This is a simple app to search for economic papers by economic journals.<br>
-    The data is gathered from RePEc.<br>
+    The data is gathered from RePEc and will be updated monthly.<br>
     Author: Xuanli Zhu.<br>
     </div>
     """, unsafe_allow_html=True)
