@@ -143,6 +143,8 @@ def main():
     hide_right_menu()
 
     key_words = st.text_input('Keywords in Title and Abstract')
+    button_clicked = st.button("Search")
+
     js = ['aer', 'jpe', 'qje', 'ecta', 'restud',
           'aejmac', 'aejmic', 'aejapp', 'aejpol', 'aeri',
           'restat', 'jeea', 'eer', 'ej',
@@ -162,7 +164,7 @@ def main():
     year_end = c2.number_input('Year to', value=year_max, min_value=year_min, max_value=year_max)
     sort_mth = c3.selectbox('Sort by', ['Most recent', ], index=0)  # 'Most cited'
     max_show = c4.number_input('Max. Shown', value=100, min_value=0, max_value=500)
-    button_clicked = st.button("Search")
+
 
     data_load_state = st.empty()
 
