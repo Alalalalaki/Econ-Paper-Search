@@ -142,8 +142,11 @@ def main():
     # st.text(os.getcwd())
     hide_right_menu()
 
-    key_words = st.text_input('Keywords in Title and Abstract')
-    button_clicked = st.button("Search")
+    search_bar, search_button = st.beta_columns((8, 1))
+    key_words = search_bar.text_input('Keywords in Title and Abstract')
+    with search_button:
+        st.write('##')
+        button_clicked = st.button("Search")
 
     js = ['aer', 'jpe', 'qje', 'ecta', 'restud',
           'aejmac', 'aejmic', 'aejapp', 'aejpol', 'aeri',
