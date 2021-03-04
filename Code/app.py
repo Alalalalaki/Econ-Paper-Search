@@ -71,14 +71,15 @@ def search_keywords(
 
 
 def sidebar_info():
+
     st.sidebar.header("About")
     st.sidebar.markdown("""
     <div style="font-size: small; font-style: italic">
     This is a simple app to search for economic papers by economic journals.<br>
     The data is gathered from RePEc and will be updated monthly.<br>
-    Author: Xuanli Zhu.<br>
     </div>
-    """, unsafe_allow_html=True)
+    """, unsafe_allow_html=True)  # Author: Xuanli Zhu.<br>
+
     st.sidebar.header("Search Help")
     st.sidebar.markdown("""
     <div style="font-size: small">
@@ -89,6 +90,7 @@ def sidebar_info():
     - The search will return all papers of the selected journals if the keywords are blank.<br>
     </div>
     """, unsafe_allow_html=True)
+
     st.sidebar.header("Journal Abbreviations")
     st.sidebar.markdown("""
     <div style="color: green; font-size: small">
@@ -122,15 +124,19 @@ def sidebar_info():
     restat: Review of Economics and Statistics<br>
     </div>
     """, unsafe_allow_html=True)
+
+    st.sidebar.header("Experimental Config")
+    show_abstract = st.sidebar.checkbox("show abstract", value=False)
+
     st.sidebar.header("Report Issues")
     st.sidebar.markdown("""
     <div style="font-size: small">
     Report an issue or comment at <a href="https://github.com/Alalalalaki/Econ-Paper-Search">github repo</a>
     </div>
     """, unsafe_allow_html=True)
-    st.sidebar.header("Experimental Config")
-    show_abstract = st.sidebar.checkbox("show abstract", value=False)
+
     return show_abstract
+
 
 def hide_right_menu():
     # ref: https://discuss.streamlit.io/t/how-do-i-hide-remove-the-menu-in-production/362/3
@@ -171,7 +177,6 @@ def main():
     year_end = c2.number_input('Year to', value=year_max, min_value=year_min, max_value=year_max)
     sort_mth = c3.selectbox('Sort by', ['Most recent', ], index=0)  # 'Most cited'
     max_show = c4.number_input('Max. Shown', value=100, min_value=0, max_value=500)
-
 
     data_load_state = st.empty()
 
