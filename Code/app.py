@@ -32,14 +32,19 @@ def load_data():
     return load_data_cached(update_timestamp)
 
 
-def show_papers(df):
+def show_papers(df, show_abstract):
     for index, row in df.iterrows():
         st.markdown(f'{index+1}.  [{row.title}]({row.url}). {row.authors}. {row.year}. {row.journal}.')
-        # with st.beta_expander(""):
-        #     st.markdown(row.abstract)
+        if show_abstract:
+            with st.beta_expander(""):
+                st.markdown(row.abstract)
 
 
-def search_keywords(button_clicked, df, key_words, journals, year_begin, year_end, sort_mth, max_show, data_load_state):
+def search_keywords(
+        button_clicked,
+        df, data_load_state,
+        key_words, journals, year_begin, year_end, sort_mth, max_show,
+        show_abstract):
     if button_clicked:
         data_load_state.markdown('Searching paper...')
         if (' ' in key_words) & ("\"" not in key_words):
@@ -58,7 +63,7 @@ def search_keywords(button_clicked, df, key_words, journals, year_begin, year_en
         # can use double sort: [sort_map[sort_mth], 'journal'], ascending=[False, True]
         dt = dt.sort_values(sort_map[sort_mth], ascending=False).reset_index()
         data_load_state.markdown(f'**{dt.shape[0]} Papers Found**')
-        show_papers(dt.head(max_show))
+        show_papers(dt.head(max_show), show_abstract)
     # else:
     #     data_load_state = data_load_state.markdown('**10 Random Papers**')
     #     dr = df.sample(10).reset_index()
@@ -123,7 +128,9 @@ def sidebar_info():
     Report an issue or comment at <a href="https://github.com/Alalalalaki/Econ-Paper-Search">github repo</a>
     </div>
     """, unsafe_allow_html=True)
-
+    st.sidebar.header("Experimental Config")
+    show_abstract = st.sidebar.checkbox("show abstract", value=False)
+    return show_abstract
 
 def hide_right_menu():
     # ref: https://discuss.streamlit.io/t/how-do-i-hide-remove-the-menu-in-production/362/3
@@ -138,7 +145,7 @@ def hide_right_menu():
 
 
 def main():
-    sidebar_info()
+    show_abstract = sidebar_info()
     # st.text(os.getcwd())
     hide_right_menu()
 
@@ -170,7 +177,10 @@ def main():
 
     df = load_data()
 
-    search_keywords(button_clicked, df, key_words, journals, year_begin, year_end, sort_mth, max_show, data_load_state)
+    search_keywords(button_clicked,
+                    df, data_load_state,
+                    key_words, journals, year_begin, year_end, sort_mth, max_show,
+                    show_abstract)
 
 
 if __name__ == '__main__':
