@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import os
 
+
 st.set_page_config(page_title=None, page_icon=None, layout='centered', initial_sidebar_state='collapsed')
 
 """
@@ -30,6 +31,11 @@ def load_data_cached(timestamp):
 def load_data():
     update_timestamp = os.path.getmtime("Data/papers.csv")
     return load_data_cached(update_timestamp)
+
+
+def local_css(file_name):
+    with open(file_name) as f:
+        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
 
 def show_papers(df, show_abstract):
@@ -71,7 +77,6 @@ def search_keywords(
 
 
 def sidebar_info():
-
     st.sidebar.header("About")
     st.sidebar.markdown("""
     <div style="font-size: small; font-style: italic">
@@ -145,7 +150,6 @@ def hide_right_menu():
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     </style>
-
     """
     st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
@@ -154,6 +158,8 @@ def main():
     show_abstract = sidebar_info()
     # st.text(os.getcwd())
     hide_right_menu()
+
+    local_css("Code/style.css")
 
     key_words = st.text_input('Keywords in Title and Abstract')
     button_clicked = st.button("Search")
