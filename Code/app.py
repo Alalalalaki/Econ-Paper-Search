@@ -2,6 +2,7 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 import os
+import re
 
 
 st.set_page_config(page_title=None, page_icon=None, layout='centered', initial_sidebar_state='collapsed')
@@ -54,10 +55,17 @@ def search_keywords(
     if button_clicked:
         data_load_state.markdown('Searching paper...')
         if (' ' in key_words) & ("\"" not in key_words):
+            # the case of \s but no ""
             key_words = key_words.split(' ')
             # key_words = ''.join([f'(?=.*{i})' for i in key_words_list])
         else:
-            key_words = [key_words]
+            if "\"" in key_words:
+                # the case of ""
+                _key_words = re.findall(r'(?:"[^"]*"|[^\s"])+', key_words)
+                key_words = [i.replace("\"", "") for i in _key_words]
+            else:
+                # the case of no \s and no ""
+                key_words = [key_words]
         mask_jounral = df.journal.isin(journals)
         mask_year = (df.year >= year_begin) & (df.year <= year_end)
         dt = df.loc[mask_jounral & mask_year]
@@ -91,7 +99,7 @@ def sidebar_info():
     - The search looks for the papers with title and abstract that contain all of the keywords.<br>
     - The search does not distinguish between full words and parts of words.<br>
     - The search is case insensitive.<br>
-    - The search allows for using double-quotes to find exact phrases.<br>
+    - The search allows for using double-quotes "" to find the exact phrases.<br>
     - The search will return all papers of the selected journals if the keywords are blank.<br>
     </div>
     """, unsafe_allow_html=True)
