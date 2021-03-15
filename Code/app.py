@@ -126,6 +126,7 @@ def sidebar_info():
     jep: Journal of Economic Perspectives<br>
     jet: Journal of Economic Theory<br>
     jie: Journal of International Economics<br>
+    joe: Journal of Econometrics<br>
     jole: Journal of Labor Economics<br>
     jme: Journal of Monetary Economics<br>
     jpe: Journal of Political Economy<br>
@@ -176,8 +177,8 @@ def main():
           'aejmac', 'aejmic', 'aejapp', 'aejpol', 'aeri',
           'restat', 'jeea', 'eer', 'ej',
           'jep', 'jel', 'are',
-          'jet',
           'jme', 'red', 'rand', 'jole',
+          'jet', 'joe',
           'jie', 'jpube', 'jde',
           'jeh', 'ehr', 'eeh',
           ]
