@@ -51,7 +51,7 @@ def search_keywords(
         button_clicked,
         df, data_load_state,
         key_words, journals, year_begin, year_end, sort_mth, max_show,
-        show_abstract):
+        show_abstract, search_author):
     if button_clicked:
         data_load_state.markdown('Searching paper...')
         if (' ' in key_words) & ("\"" not in key_words):
@@ -70,6 +70,8 @@ def search_keywords(
         mask_year = (df.year >= year_begin) & (df.year <= year_end)
         dt = df.loc[mask_jounral & mask_year]
         info = dt.title + ' ' + dt.abstract.fillna('')
+        if search_author:
+            info = info + ' ' + dt.authors
         masks = [info.str.contains(s, case=False, regex=False) for s in key_words]
         mask = np.vstack(masks).all(axis=0)
         dt = dt.loc[mask]
@@ -141,6 +143,7 @@ def sidebar_info():
 
     st.sidebar.header("Experimental Config")
     show_abstract = st.sidebar.checkbox("show abstract", value=False)
+    search_author = st.sidebar.checkbox("search author", value=False)
 
     st.sidebar.header("Report Issues")
     st.sidebar.markdown("""
@@ -149,7 +152,7 @@ def sidebar_info():
     </div>
     """, unsafe_allow_html=True)
 
-    return show_abstract
+    return show_abstract, search_author
 
 
 def hide_right_menu():
@@ -164,7 +167,7 @@ def hide_right_menu():
 
 
 def main():
-    show_abstract = sidebar_info()
+    show_abstract, search_author = sidebar_info()
     # st.text(os.getcwd())
     hide_right_menu()
 
@@ -177,8 +180,8 @@ def main():
           'aejmac', 'aejmic', 'aejapp', 'aejpol', 'aeri',
           'restat', 'jeea', 'eer', 'ej',
           'jep', 'jel', 'are',
-          'jme', 'red', 'rand', 'jole',
           'jet', 'joe',
+          'jme', 'red', 'rand', 'jole',
           'jie', 'jpube', 'jde',
           'jeh', 'ehr', 'eeh',
           ]
@@ -200,7 +203,7 @@ def main():
     search_keywords(button_clicked,
                     df, data_load_state,
                     key_words, journals, year_begin, year_end, sort_mth, max_show,
-                    show_abstract)
+                    show_abstract, search_author)
 
 
 if __name__ == '__main__':
