@@ -133,6 +133,7 @@ def sidebar_info():
     jme: Journal of Monetary Economics<br>
     jpe: Journal of Political Economy<br>
     jpube: Journal of Public Economics<br>
+    qe: Quantitative Economics<br>
     qje: Quarterly Journal of Economics<br>
     rand: RAND Journal of Economics<br>
     red: Review of Economic Dynamics<br>
@@ -180,6 +181,7 @@ def main():
           'aejmac', 'aejmic', 'aejapp', 'aejpol', 'aeri',
           'restat', 'jeea', 'eer', 'ej',
           'jep', 'jel', 'are',
+          'qe',
           'jet', 'joe',
           'jme', 'red', 'rand', 'jole',
           'jie', 'jpube', 'jde',
