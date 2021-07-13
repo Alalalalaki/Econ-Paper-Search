@@ -128,7 +128,7 @@ def sidebar_info():
     - The search does not distinguish between full words and parts of words.<br>
     - The search is case insensitive.<br>
     - The search allows for using double-quotes "" to find the exact phrases.<br>
-    - The search allows for using | between multiply words (no spaces) to match either words.
+    - The search allows for using | between multiply words (no spaces) to match either words.<br>
     - The search will return all papers of the selected journals if the keywords are blank.<br>
     </div>
     """, unsafe_allow_html=True)
