@@ -88,6 +88,8 @@ def search_keywords(
                 mask_or.append(np.vstack(masks_or).any(axis=0))
             mask_or = np.vstack(mask_or).all(axis=0)
             key_words = [s for s in key_words if s not in key_words_or]
+            if not key_words:
+                key_words = [""]
         else:
             mask_or = [True]*len(dt)
 
