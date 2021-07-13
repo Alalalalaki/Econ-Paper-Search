@@ -54,6 +54,17 @@ def search_keywords(
         show_abstract, search_author):
     if button_clicked:
         data_load_state.markdown('Searching paper...')
+
+        # preliminary select on
+
+        mask_jounral = df.journal.isin(journals)
+        mask_year = (df.year >= year_begin) & (df.year <= year_end)
+        dt = df.loc[mask_jounral & mask_year]
+        info = dt.title + ' ' + dt.abstract.fillna('')
+        if search_author:
+            info = info + ' ' + dt.authors
+
+        # the case of ""
         if (' ' in key_words) & ("\"" not in key_words):
             # the case of \s but no ""
             key_words = key_words.split(' ')
@@ -66,18 +77,31 @@ def search_keywords(
             else:
                 # the case of no \s and no ""
                 key_words = [key_words]
-        mask_jounral = df.journal.isin(journals)
-        mask_year = (df.year >= year_begin) & (df.year <= year_end)
-        dt = df.loc[mask_jounral & mask_year]
-        info = dt.title + ' ' + dt.abstract.fillna('')
-        if search_author:
-            info = info + ' ' + dt.authors
+
+        # the case of |
+        key_words_or = [s for s in key_words if "|" in s]
+        if key_words_or:
+            mask_or = []
+            for kws in key_words_or:
+                kws = kws.split("|")
+                masks_or = [info.str.contains(s, case=False, regex=False) for s in kws]
+                mask_or.append(np.vstack(masks_or).any(axis=0))
+            mask_or = np.vstack(mask_or).all(axis=0)
+            key_words = [s for s in key_words if s not in key_words_or]
+        else:
+            mask_or = [True]*len(dt)
+
+        # final select on
         masks = [info.str.contains(s, case=False, regex=False) for s in key_words]
-        mask = np.vstack(masks).all(axis=0)
+        mask = np.vstack([np.vstack(masks), mask_or]).all(axis=0)
         dt = dt.loc[mask]
+
+        # sort
         sort_map = {'Most recent': 'year', 'Most cited': 'cite'}
         # can use double sort: [sort_map[sort_mth], 'journal'], ascending=[False, True]
         dt = dt.sort_values(sort_map[sort_mth], ascending=False).reset_index()
+
+        # show results
         data_load_state.markdown(f'**{dt.shape[0]} Papers Found**')
         show_papers(dt.head(max_show), show_abstract)
     # else:
@@ -102,6 +126,7 @@ def sidebar_info():
     - The search does not distinguish between full words and parts of words.<br>
     - The search is case insensitive.<br>
     - The search allows for using double-quotes "" to find the exact phrases.<br>
+    - The search allows for using | between multiply words (no spaces) to match either words.
     - The search will return all papers of the selected journals if the keywords are blank.<br>
     </div>
     """, unsafe_allow_html=True)
