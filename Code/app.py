@@ -26,6 +26,9 @@ def load_data_cached(timestamp):
     df = df.loc[mask]
     # drop some duplicates due to weird strings in authors and abstract
     df = df[~df.duplicated(['title', 'url']) | df.url.isna()]
+    # replace broken links to None
+    broken_links = ["http://hdl.handle.net/", ]
+    df.loc[df.url in broken_links, "url"] = None
     return df
 
 
@@ -41,7 +44,10 @@ def local_css(file_name):
 
 def show_papers(df, show_abstract):
     for index, row in df.iterrows():
-        st.markdown(f'{index+1}.  [{row.title}]({row.url}). {row.authors}. {row.year}. {row.journal}.')
+        if row.url:
+            st.markdown(f'{index+1}.  [{row.title}]({row.url}). {row.authors}. {row.year}. {row.journal}.')
+        else:
+            st.markdown(f'{index+1}.  {row.title}. {row.authors}. {row.year}. {row.journal}.')
         if show_abstract:
             with st.beta_expander(""):
                 st.markdown(row.abstract)
@@ -56,7 +62,6 @@ def search_keywords(
         data_load_state.markdown('Searching paper...')
 
         # preliminary select on
-
         mask_jounral = df.journal.isin(journals)
         mask_year = (df.year >= year_begin) & (df.year <= year_end)
         dt = df.loc[mask_jounral & mask_year]
