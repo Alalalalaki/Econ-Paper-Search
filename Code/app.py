@@ -28,7 +28,7 @@ def load_data_cached(timestamp):
     df = df[~df.duplicated(['title', 'url']) | df.url.isna()]
     # replace broken links to None
     broken_links = ["http://hdl.handle.net/", ]
-    df.loc[df.url in broken_links, "url"] = None
+    df.loc[df.url.isin(broken_links), "url"] = None
     return df
 
 
