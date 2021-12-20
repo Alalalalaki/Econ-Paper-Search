@@ -206,8 +206,10 @@ def main():
 
     local_css("Code/style.css")
 
-    key_words = st.text_input('Keywords in Title and Abstract')
-    button_clicked = st.button("Search")
+    form = st.form(key='search')
+
+    key_words = form.text_input('Keywords in Title and Abstract')
+    button_clicked = form.form_submit_button(label='Search')
 
     js = ['aer', 'jpe', 'qje', 'ecta', 'restud',
           'aejmac', 'aejmic', 'aejapp', 'aejpol', 'aeri',
@@ -219,12 +221,12 @@ def main():
           'jie', 'jpube', 'jde',
           'jeh', 'ehr', 'eeh',
           ]
-    journals = st.multiselect("Journals", js, js)  # js[:21] // (see left sidebar for journal abbreviations)
+    journals = form.multiselect("Journals", js, js)  # js[:21] // (see left sidebar for journal abbreviations)
 
     year_min = 1900
     year_max = 2021
 
-    c1, c2, c3, c4 = st.beta_columns(4)
+    c1, c2, c3, c4 = form.columns(4)
     year_begin = c1.number_input('Year from', value=1980, min_value=year_min, max_value=year_max)
     year_end = c2.number_input('Year to', value=year_max, min_value=year_min, max_value=year_max)
     sort_mth = c3.selectbox('Sort by', ['Most recent', ], index=0)  # 'Most cited'
