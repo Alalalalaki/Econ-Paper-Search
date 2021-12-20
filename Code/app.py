@@ -128,13 +128,13 @@ def sidebar_info():
 
     st.sidebar.header("Search Help")
     st.sidebar.markdown("""
-    <div style="font-size: small">
-    - The search looks for the papers with title and abstract that contain all of the keywords.<br>
-    - The search does not distinguish between full words and parts of words.<br>
-    - The search is case insensitive.<br>
-    - The search allows for using double-quotes "" to find the exact phrases.<br>
-    - The search allows for using | between multiply words (no spaces) to match either words.<br>
-    - The search will return all papers of the selected journals if the keywords are blank.<br>
+    <div style="font-size: small; font-style: italic"">
+    - The search looks for the papers with title and abstract that contain <b>all of the keywords</b> (split by space).<br>
+    - The search does not distinguish between full words and <b>parts of words</b>.<br>
+    - The search is <b>case insensitive</b>.<br>
+    - The search allows for using double-quotes "" to find the <b>exact phrases</b> (with space inside).<br>
+    - The search allows for using | between multiply words (no spaces) to match <b>either words</b>.<br>
+    - The search will return all papers of the selected journals if the keywords are <b>blank</b>.<br>
     </div>
     """, unsafe_allow_html=True)
 
@@ -213,11 +213,11 @@ def main():
 
     key_words = form.text_input('Keywords in Title and Abstract')
 
-    a1, a2 = form.columns([1.14, 1])
+    a1, a2 = form.columns([1.27, 1])
     button_clicked = a1.form_submit_button(label='Search')
     a2.markdown(
         """<div style="color: green; font-size: small; padding-bottom: 0;">
-        (see left sidebar for search helps and journal abbreviations)
+        (see left sidebar for search help & journal abbreviations)
         </div>""",
         unsafe_allow_html=True)
 
