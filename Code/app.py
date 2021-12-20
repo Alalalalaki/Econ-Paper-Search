@@ -171,6 +171,9 @@ def sidebar_info():
     red: Review of Economic Dynamics<br>
     restud: Review of Economic Studies<br>
     restat: Review of Economics and Statistics<br>
+    top5: [aer+ecta+jpe+qje+restud]<br>
+    general: top5+[aeri+restat+jeea+eer+ej+qe]<br>
+    survey: [jep+jel+are]<br>
     </div>
     """, unsafe_allow_html=True)
 
@@ -221,7 +224,19 @@ def main():
           'jie', 'jpube', 'jde',
           'jeh', 'ehr', 'eeh',
           ]
-    journals = form.multiselect("Journals", js, js)  # js[:21] // (see left sidebar for journal abbreviations)
+    js_cats = {"top5": ['aer', 'jpe', 'qje', 'ecta', 'restud'],
+               "general": ['aer', 'jpe', 'qje', 'ecta', 'restud', 'aeri', 'restat', 'jeea', 'eer', 'ej', 'qe'],
+               "survey": ['jep', 'jel', 'are', ]
+               }
+    js_cats_keys = list(js_cats.keys())
+    # (see left sidebar for journal abbreviations)
+    journals = form.multiselect("Journals", js_cats_keys+js, js)  # js[:21] //
+    # if selected journals include js_cats
+    js_temp = set(journals) & set(js_cats_keys)
+    if js_temp:
+        for c in js_temp:
+            journals += js_cats[c]
+        journals = set(journals)
 
     year_min = 1900
     year_max = 2021
