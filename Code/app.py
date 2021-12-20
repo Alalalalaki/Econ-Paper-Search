@@ -212,7 +212,14 @@ def main():
     form = st.form(key='search')
 
     key_words = form.text_input('Keywords in Title and Abstract')
-    button_clicked = form.form_submit_button(label='Search')
+
+    a1, a2 = form.columns([1.14, 1])
+    button_clicked = a1.form_submit_button(label='Search')
+    a2.markdown(
+        """<div style="color: green; font-size: small; padding-bottom: 0;">
+        (see left sidebar for search helps and journal abbreviations)
+        </div>""",
+        unsafe_allow_html=True)
 
     js = ['aer', 'jpe', 'qje', 'ecta', 'restud',
           'aejmac', 'aejmic', 'aejapp', 'aejpol', 'aeri',
@@ -224,13 +231,14 @@ def main():
           'jie', 'jpube', 'jde',
           'jeh', 'ehr', 'eeh',
           ]
-    js_cats = {"top5": ['aer', 'jpe', 'qje', 'ecta', 'restud'],
+    js_cats = {"all": js,
+               "top5": ['aer', 'jpe', 'qje', 'ecta', 'restud'],
                "general": ['aer', 'jpe', 'qje', 'ecta', 'restud', 'aeri', 'restat', 'jeea', 'eer', 'ej', 'qe'],
                "survey": ['jep', 'jel', 'are', ]
                }
     js_cats_keys = list(js_cats.keys())
-    # (see left sidebar for journal abbreviations)
-    journals = form.multiselect("Journals", js_cats_keys+js, js)  # js[:21] //
+    journals = form.multiselect("Journals",
+                                js_cats_keys+js, js)  # js[:21] //
     # if selected journals include js_cats
     js_temp = set(journals) & set(js_cats_keys)
     if js_temp:
