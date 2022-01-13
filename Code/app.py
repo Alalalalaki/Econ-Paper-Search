@@ -157,7 +157,7 @@ def sidebar_info():
     ier: International Economic Review<br>
     jde: Journal of Development Economics<br>
     jeea: Journal of the European Economic Association<br>
-    jeg: Journal of Economic Growth
+    jeg: Journal of Economic Growth<br>
     jel: The Journal of Economic History<br>
     jel: Journal of Economic Literature<br>
     jep: Journal of Economic Perspectives<br>
