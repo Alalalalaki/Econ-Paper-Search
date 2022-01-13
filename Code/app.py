@@ -16,8 +16,8 @@ st.set_page_config(page_title=None, page_icon=None, layout='centered', initial_s
 @st.cache(show_spinner=False)
 def load_data_cached(timestamp):
     df = pd.read_csv("Data/papers.csv",
-                     usecols=["title", "authors", "abstract", "url", "jel", "journal", "year"],
-                     dtype={"year": "Int16"}
+                     usecols=["title", "authors", "abstract", "url",  "journal", "year"],  # "jel",
+                     dtype={"year": "int"}  # Int16
                      ).drop_duplicates()
     df = df[~df.year.isna()]
     # drop book reviews (not perfect)
