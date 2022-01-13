@@ -142,10 +142,10 @@ def sidebar_info():
     st.sidebar.header("Journal Abbreviations")
     st.sidebar.markdown("""
     <div style="color: green; font-size: small">
-    aejmic: AEJ Micro<br>
-    aejpol: AEJ Policy<br>
     aejapp: AEJ Applied Economics<br>
     aejmac: AEJ Macroeconomics<br>
+    aejmic: AEJ Micro<br>
+    aejpol: AEJ Policy<br>
     aer: American Economic Review<br>
     aeri: AER Insights<br>
     are: Annual Review of Economics<br>
@@ -154,12 +154,15 @@ def sidebar_info():
     ej: Economic Journal<br>
     eer: European Economic Review<br>
     eeh: Explorations in Economic History<br>
+    ier: International Economic Review<br>
     jde: Journal of Development Economics<br>
     jeea: Journal of the European Economic Association<br>
+    jeg: Journal of Economic Growth
     jel: The Journal of Economic History<br>
     jel: Journal of Economic Literature<br>
     jep: Journal of Economic Perspectives<br>
     jet: Journal of Economic Theory<br>
+    jhr: Journal of Human Resources<br>
     jie: Journal of International Economics<br>
     joe: Journal of Econometrics<br>
     jole: Journal of Labor Economics<br>
@@ -172,6 +175,8 @@ def sidebar_info():
     red: Review of Economic Dynamics<br>
     restud: Review of Economic Studies<br>
     restat: Review of Economics and Statistics<br>
+    te: Theoretical Economics<br>
+    <br>
     top5: [aer+ecta+jpe+qje+restud]<br>
     general: top5+[aeri+restat+jeea+eer+ej+qe]<br>
     survey: [jep+jel+are]<br>
@@ -226,10 +231,10 @@ def main():
           'aejmac', 'aejmic', 'aejapp', 'aejpol', 'aeri',
           'restat', 'jeea', 'eer', 'ej',
           'jep', 'jel', 'are',
-          'qe',
-          'jet', 'joe',
-          'jme', 'red', 'rand', 'jole',
-          'jie', 'jpube', 'jde',
+          'qe', 'jeg',
+          'jet', 'te', 'joe',
+          'jme', 'red', 'rand', 'jole', 'jhr',
+          'jie', 'ier', 'jpube', 'jde',
           'jeh', 'ehr', 'eeh',
           ]
     js_cats = {"all": js,
