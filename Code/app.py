@@ -104,9 +104,9 @@ def search_keywords(
         dt = dt.loc[mask]
 
         # sort
-        sort_map = {'Most recent': 'year', 'Most cited': 'cite'}
+        sort_map = {'Most recent': ['year', False], 'Most early': ['year', True], }  # 'Most cited': 'cite'
         # can use double sort: [sort_map[sort_mth], 'journal'], ascending=[False, True]
-        dt = dt.sort_values(sort_map[sort_mth], ascending=False).reset_index()
+        dt = dt.sort_values(sort_map[sort_mth][0], ascending=sort_map[sort_mth][1]).reset_index()
 
         # show results
         data_load_state.markdown(f'**{dt.shape[0]} Papers Found**')
@@ -258,7 +258,7 @@ def main():
     c1, c2, c3, c4 = form.columns(4)
     year_begin = c1.number_input('Year from', value=1980, min_value=year_min, max_value=year_max)
     year_end = c2.number_input('Year to', value=year_max, min_value=year_min, max_value=year_max)
-    sort_mth = c3.selectbox('Sort by', ['Most recent', ], index=0)  # 'Most cited'
+    sort_mth = c3.selectbox('Sort by', ['Most recent', 'Most early'], index=0)  # 'Most cited'
     max_show = c4.number_input('Max. Shown', value=100, min_value=0, max_value=500)
 
     data_load_state = st.empty()
