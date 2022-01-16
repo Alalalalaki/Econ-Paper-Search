@@ -22,8 +22,8 @@
    padding: 0;
 }
 
-/* multiselect (this change with html) */
-.st-e8 {
+/* multiselect */
+.stMultiSelect span[role="presentation"] {
     margin-left: 0px;
 }
 
