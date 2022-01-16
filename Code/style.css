@@ -17,7 +17,17 @@
    padding: 0;
 }
 
-/* multiselect */
+.streamlit-expanderHeader {
+   border: 0;
+   padding: 0;
+}
+
+/* multiselect (this change with html) */
 .st-e8 {
     margin-left: 0px;
+}
+
+/* stcheckbox (abstract) */
+.css-1djdyxw {
+    font-size: small;
 }

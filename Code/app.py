@@ -219,13 +219,16 @@ def main():
 
     key_words = form.text_input('Keywords in Title and Abstract')
 
-    a1, a2 = form.columns([1.27, 1])
+    a1, a2 = form.columns([1.53, 1])
     button_clicked = a1.form_submit_button(label='Search')
     a2.markdown(
         """<div style="color: green; font-size: small; padding-bottom: 0;">
-        (see left sidebar for search help & journal abbreviations)
+        (see left sidebar for search help & journal abbrevs)
         </div>""",
         unsafe_allow_html=True)
+
+    # alternatively add show abstract here
+    # show_abstract = a3.checkbox("show abstract", value=False)
 
     js = ['aer', 'jpe', 'qje', 'ecta', 'restud',
           'aejmac', 'aejmic', 'aejapp', 'aejpol', 'aeri',
