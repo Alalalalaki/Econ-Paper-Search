@@ -121,7 +121,7 @@ def sidebar_info():
     st.sidebar.header("About")
     st.sidebar.markdown("""
     <div style="font-size: small; font-style: italic">
-    This is a simple app to search for economic papers by economics journals.<br>
+    This is a simple app to search for economics papers by economics journals.<br>
     It allows to search for only economics papers and to select the set of economics jounrals.
     The data is gathered from RePEc and will be updated monthly.<br>
     </div>
