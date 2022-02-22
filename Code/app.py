@@ -13,12 +13,19 @@ st.set_page_config(page_title=None, page_icon=None, layout='centered', initial_s
 """
 
 
+def load_data_and_combine():
+    args = {"dtype": {"year": "Int16"}, "usecols": ["title", "authors", "abstract", "url",  "journal", "year"]}
+    df1 = pd.read_csv("Data/papers_b2000.csv", **args)
+    df2 = pd.read_csv("Data/papers_2000s.csv", **args)
+    df3 = pd.read_csv("Data/papers_2010s.csv", **args)
+    df4 = pd.read_csv("Data/papers_recent.csv", **args)
+    df = pd.concat([df1, df2, df3, df4], axis=0)
+    return df
+
+
 @st.cache(show_spinner=False)
 def load_data_cached(timestamp):
-    df = pd.read_csv("Data/papers.csv",
-                     usecols=["title", "authors", "abstract", "url",  "journal", "year"],  # "jel",
-                     dtype={"year": "Int16"}
-                     ).drop_duplicates()
+    df = load_data_and_combine()
     df = df[~df.year.isna()]
     # drop book reviews (not perfect)
     masks = [~df.title.str.contains(i, case=False, regex=False) for i in ["pp.", " p."]]  # "pages," " pp "
