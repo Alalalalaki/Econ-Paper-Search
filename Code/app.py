@@ -40,7 +40,7 @@ def load_data_cached(timestamp):
 
 
 def load_data():
-    update_timestamp = os.path.getmtime("Data/papers.csv")
+    update_timestamp = os.path.getmtime("Data/papers_recent.csv")
     return load_data_cached(update_timestamp)
 
 
