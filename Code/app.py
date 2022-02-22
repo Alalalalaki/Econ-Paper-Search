@@ -190,7 +190,7 @@ def sidebar_info():
     st.sidebar.header("Report Issues")
     st.sidebar.markdown("""
     <div style="font-size: small">
-    Report an issue or comment at <a href="https://github.com/Alalalalaki/Econ-Paper-Search">github repo</a>
+    Report an issue or comment at <a href="https://github.com/Alalalalaki/Econ-Paper-Search" target="_blank" rel="noopener noreferrer">github repo</a>
     </div>
     """, unsafe_allow_html=True)
 
