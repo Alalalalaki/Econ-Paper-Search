@@ -1,6 +1,6 @@
 A simple web app to search for **economics papers** in **economics journals**.
 
-https://share.streamlit.io/alalalalaki/econ-paper-search/main/Code/app.py
+https://econ-paper-search.streamlitapp.com/
 
 Why not Google Search?
 - one often gets noneconomics papers in the results
