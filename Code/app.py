@@ -31,6 +31,8 @@ def load_data_cached(timestamp):
     masks = [~df.title.str.contains(i, case=False, regex=False) for i in ["pp.", " p."]]  # "pages," " pp "
     mask = np.vstack(masks).all(axis=0)
     df = df.loc[mask]
+    # remove line breaks in title
+    df.title = df.title.replace(r'\n', ' ', regex=True)
     # drop some duplicates due to weird strings in authors and abstract
     df = df[~df.duplicated(['title', 'url']) | df.url.isna()]
     # replace broken links to None
@@ -135,8 +137,10 @@ def sidebar_info():
     This is a simple app to search for economics papers by economics journals.<br>
     It allows to search for only economics papers and to select the set of economics jounrals.
     The data is gathered from RePEc and will be updated monthly.<br>
+    <br>
+    Author: <a href="https://zhuxuanli.com" target="_blank" rel="noopener noreferrer">Xuanli Zhu</a><br>
     </div>
-    """, unsafe_allow_html=True)  # Author: Xuanli Zhu.<br>
+    """, unsafe_allow_html=True)
 
     st.sidebar.header("Search Help")
     st.sidebar.markdown("""
