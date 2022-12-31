@@ -64,7 +64,7 @@ def search_keywords(
         button_clicked,
         df, data_load_state,
         key_words, journals, year_begin, year_end, sort_mth, max_show,
-        show_abstract, search_author):
+        show_abstract, search_author, random_roll):
     if button_clicked:
         data_load_state.markdown('Searching paper...')
 
@@ -116,8 +116,12 @@ def search_keywords(
         dt = dt.sort_values(sort_map[sort_mth][0], ascending=sort_map[sort_mth][1]).reset_index()
 
         # show results
-        data_load_state.markdown(f'**{dt.shape[0]} Papers Found**')
-        show_papers(dt.head(max_show), show_abstract)
+        if random_roll:
+            data_load_state.markdown(f'**Roll From {dt.shape[0]} Papers**')
+            show_papers(dt.sample(), show_abstract)
+        else:
+            data_load_state.markdown(f'**{dt.shape[0]} Papers Found**')
+            show_papers(dt.head(max_show), show_abstract)
     # else:
     #     data_load_state = data_load_state.markdown('**10 Random Papers**')
     #     dr = df.sample(10).reset_index()
@@ -193,6 +197,7 @@ def sidebar_info():
     st.sidebar.header("Experimental Config")
     show_abstract = st.sidebar.checkbox("show abstract", value=False)
     search_author = st.sidebar.checkbox("search author", value=False)
+    random_roll = st.sidebar.checkbox("random roll", value=False)
 
     st.sidebar.header("Report Issues")
     st.sidebar.markdown("""
@@ -201,7 +206,7 @@ def sidebar_info():
     </div>
     """, unsafe_allow_html=True)
 
-    return show_abstract, search_author
+    return show_abstract, search_author, random_roll
 
 
 def hide_right_menu():
@@ -216,7 +221,7 @@ def hide_right_menu():
 
 
 def main():
-    show_abstract, search_author = sidebar_info()
+    show_abstract, search_author, random_roll = sidebar_info()
     # st.text(os.getcwd())
     hide_right_menu()
 
@@ -224,10 +229,15 @@ def main():
 
     form = st.form(key='search')
 
-    key_words = form.text_input('Keywords in Title and Abstract')
+    if not random_roll:
+        key_words = form.text_input('Keywords in Title and Abstract')
+        button_label = 'Search'
+    else:
+        key_words = ""
+        button_label = 'Roll a rondom paper'
 
     a1, a2 = form.columns([1.53, 1])
-    button_clicked = a1.form_submit_button(label='Search')
+    button_clicked = a1.form_submit_button(label=button_label)
     a2.markdown(
         """<div style="color: green; font-size: small; padding-bottom: 0;">
         (see left sidebar for search help & journal abbrevs)
@@ -245,7 +255,7 @@ def main():
           'jet', 'te', 'joe',
           'jme', 'red', 'rand', 'jole', 'jhr',
           'jie', 'ier', 'jpube', 'jde',
-          'jeh', 'ehr', 'eeh',
+          'jeh', 'ehr', # 'eeh',
           ]
     js_cats = {"all": js,
                "top5": ['aer', 'jpe', 'qje', 'ecta', 'restud'],
@@ -278,7 +288,7 @@ def main():
     search_keywords(button_clicked,
                     df, data_load_state,
                     key_words, journals, year_begin, year_end, sort_mth, max_show,
-                    show_abstract, search_author)
+                    show_abstract, search_author, random_roll)
 
 
 if __name__ == '__main__':
