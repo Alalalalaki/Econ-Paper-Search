@@ -154,6 +154,11 @@ def sidebar_info():
     </div>
     """, unsafe_allow_html=True)
 
+    st.sidebar.header("Experimental Config")
+    show_abstract = st.sidebar.checkbox("show abstract", value=False)
+    search_author = st.sidebar.checkbox("search author", value=False)
+    random_roll = st.sidebar.checkbox("random roll", value=False)
+
     st.sidebar.header("Journal Abbreviations")
     st.sidebar.markdown("""
     <div style="color: green; font-size: small">
@@ -197,11 +202,6 @@ def sidebar_info():
     survey: [jep+jel+are]<br>
     </div>
     """, unsafe_allow_html=True)
-
-    st.sidebar.header("Experimental Config")
-    show_abstract = st.sidebar.checkbox("show abstract", value=False)
-    search_author = st.sidebar.checkbox("search author", value=False)
-    random_roll = st.sidebar.checkbox("random roll", value=False)
 
     st.sidebar.header("Report Issues")
     st.sidebar.markdown("""
