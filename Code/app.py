@@ -157,6 +157,7 @@ def sidebar_info():
     st.sidebar.header("Experimental Config")
     show_abstract = st.sidebar.checkbox("show abstract", value=False)
     search_author = st.sidebar.checkbox("search author", value=False)
+    full_journal = st.sidebar.checkbox("full set of journals", value=False)
     random_roll = st.sidebar.checkbox("random roll", value=False)
 
     st.sidebar.header("Journal Abbreviations")
@@ -210,7 +211,7 @@ def sidebar_info():
     </div>
     """, unsafe_allow_html=True)
 
-    return show_abstract, search_author, random_roll
+    return show_abstract, search_author, random_roll, full_journal
 
 
 def hide_right_menu():
@@ -225,7 +226,7 @@ def hide_right_menu():
 
 
 def main():
-    show_abstract, search_author, random_roll = sidebar_info()
+    show_abstract, search_author, random_roll, full_journal = sidebar_info()
     # st.text(os.getcwd())
     hide_right_menu()
 
@@ -261,6 +262,13 @@ def main():
           'jie', 'ier', 'jpube', 'jde',
           'jeh', 'ehr', # 'eeh',
           ]
+    js_ = ["jae","geb","jinde","jlawe","jhe","jebo","ee","ectt","imfer","ecot","jmcb","jue","edcc","sje","ecoa",
+            "jaere","jeem","wber","ieio","jleo","le","jpope","qme","ei","jedc","cej","obes","jems","jes","jmate",
+            "rsue","eedur","jhc","efp","aler","jbes","jru","jpam","jfe",
+            'eeh',
+            ]
+    if full_journal:
+        js += js_
     js_cats = {"all": js,
                "top5": ['aer', 'jpe', 'qje', 'ecta', 'restud'],
                "general": ['aer', 'jpe', 'qje', 'ecta', 'restud', 'aeri', 'restat', 'jeea', 'eer', 'ej', 'qe'],
