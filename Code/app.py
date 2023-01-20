@@ -241,7 +241,7 @@ def main():
         key_words = ""
         button_label = 'Roll a rondom paper'
 
-    a1, a2 = form.columns([1.07, 1])
+    a1, a2 = form.columns([1.08, 1]) # 1.53 without " & configs!"
     button_clicked = a1.form_submit_button(label=button_label)
     a2.markdown(
         """<div style="color: green; font-size: small; padding-bottom: 0;">
