@@ -245,7 +245,7 @@ def main():
     button_clicked = a1.form_submit_button(label=button_label)
     a2.markdown(
         """<div style="color: green; font-size: small; padding-bottom: 0;">
-        (see left sidebar for search help & journal abbrevs & configs!)
+        (see left sidebar for search help & journal abbrevs & <font color="blue">configs</font>!)
         </div>""",
         unsafe_allow_html=True)
 
