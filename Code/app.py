@@ -123,7 +123,7 @@ def search_keywords(
             show_papers(dt.sample(), show_abstract)
         else:
             data_load_state.markdown(f'**{dt.shape[0]} Papers Found**')
-            show_papers(dt.head(max_show), show_abstract)
+            show_papers(dt.head(int(max_show)), show_abstract)
     # else:
     #     data_load_state = data_load_state.markdown('**10 Random Papers**')
     #     dr = df.sample(10).reset_index()
