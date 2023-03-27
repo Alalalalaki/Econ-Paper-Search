@@ -260,9 +260,10 @@ def main():
           'jet', 'te', 'joe',
           'jme', 'red', 'rand', 'jole', 'jhr',
           'jie', 'ier', 'jpube', 'jde',
-          'jeh', 'ehr', # 'eeh',
+          'jeh', 'ehr',
+          "jhe",
           ]
-    js_ = ["jae","geb","jinde","jlawe","jhe","jebo","ee","ectt","imfer","ecot","jmcb","jue","edcc","sje","ecoa",
+    js_ = ["jae","geb","jinde","jlawe","jebo","ee","ectt","imfer","ecot","jmcb","jue","edcc","sje","ecoa",
             "jaere","jeem","wber","ieio","jleo","le","jpope","qme","ei","jedc","cej","obes","jems","jes","jmate",
             "rsue","eedur","jhc","efp","aler","jbes","jru","jpam","jfe",
             'eeh',
