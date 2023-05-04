@@ -134,11 +134,11 @@ def sidebar_info():
     st.sidebar.header("About")
     st.sidebar.markdown("""
     <div style="font-size: small; font-style: italic">
-    This is a simple app to search for economics papers by economics journals.<br>
-    It allows to search for only economics papers and to select the set of economics jounrals.
-    The data is gathered from RePEc and will be updated monthly.<br>
+    This is a simple app to search for <b>economics papers</b> on leading economics journals.<br>
+    It allows to <b>smart search</b> for only economics papers with selection of the set of economics jounrals.<br>
+    The data is gathered from <b>RePEc</b> and will be <b>updated monthly (at 1st)</b>.<br>
     <br>
-    Author: <a href="https://zhuxuanli.com" target="_blank" rel="noopener noreferrer">Xuanli Zhu</a><br>
+    <b>Author</b>: <a href="https://zhuxuanli.com" target="_blank" rel="noopener noreferrer">Xuanli Zhu</a><br>
     </div>
     """, unsafe_allow_html=True)
 
@@ -174,7 +174,6 @@ def sidebar_info():
     ehr: Economic History Review<br>
     ej: Economic Journal<br>
     eer: European Economic Review<br>
-    eeh: Explorations in Economic History<br>
     ier: International Economic Review<br>
     jde: Journal of Development Economics<br>
     jeea: Journal of the European Economic Association<br>
@@ -183,12 +182,14 @@ def sidebar_info():
     jel: Journal of Economic Literature<br>
     jep: Journal of Economic Perspectives<br>
     jet: Journal of Economic Theory<br>
+    jhe: Journal of Health Economics<br>
     jhr: Journal of Human Resources<br>
     jie: Journal of International Economics<br>
     joe: Journal of Econometrics<br>
     jole: Journal of Labor Economics<br>
     jme: Journal of Monetary Economics<br>
     jpe: Journal of Political Economy<br>
+    jpemic: Journal of Political Economy Microeconomics<br>
     jpube: Journal of Public Economics<br>
     qe: Quantitative Economics<br>
     qje: Quarterly Journal of Economics<br>
@@ -197,6 +198,45 @@ def sidebar_info():
     restud: Review of Economic Studies<br>
     restat: Review of Economics and Statistics<br>
     te: Theoretical Economics<br>
+    <br>
+    aler: American Law and Economics Review<br>
+    cej: Canadian Journal of Economics<br>
+    ecoa: Economica<br>
+    ectt: Econometric Theory<br>
+    edcc: Economic Development and Cultural Change<br>
+    ee: Experimental Economics<br>
+    eedur: Economics of Education Review<br>
+    eeh: Explorations in Economic History<br>
+    efp: Education Finance and Policy<br>
+    ei: Economic Inquiry<br>
+    geb: Games and Economic Behavior<br>
+    imfer: IMF Economic Review<br>
+    jae: Journal of Applied Econometrics<br>
+    jaere: Journal of the Association of Environmental and Resource Economists<br>
+    jbes: Journal of Business & Economic Statistics<br>
+    jede: Journal of Economic Dynamics and Control<br>
+    jemstr: Journal of Economics & Management Strategy<br>
+    jeem: Journal of Environmental Economics and Management<br>
+    jecsur: Journal of Economic Surveys<br>
+    jebo: Journal of Economic Behavior & Organization<br>
+    jfe: Journal of Financial Economics<br>
+    jhc: Journal of Housing Economics<br>
+    jinde: Journal of Industrial Economics<br>
+    jpam: Journal of Policy Analysis and Management<br>
+    jpemic: Journal of Political Economy and Macroeconomics<br>
+    jpope: Journal of Population Economics<br>
+    jru: Journal of Risk and Uncertainty<br>
+    jue: Journal of Urban Economics<br>
+    jleo: Journal of Law, Economics, and Organization<br>
+    jlawe: Journal of Law and Economics<br>
+    jmcb: Journal of Money, Credit and Banking<br>
+    jmate: Journal of Mathematical Economics<br>
+    le: Labour Economics<br>
+    obes: Oxford Bulletin of Economics and Statistics<br>
+    qme: Quantitative Marketing and Economics<br>
+    rsue: Regional Science and Urban Economics<br>
+    sje: Scandinavian Journal of Economics<br>
+    wber: World Bank Economic Review<br>
     <br>
     top5: [aer+ecta+jpe+qje+restud]<br>
     general: top5+[aeri+restat+jeea+eer+ej+qe]<br>
@@ -254,6 +294,7 @@ def main():
 
     js = ['aer', 'jpe', 'qje', 'ecta', 'restud',
           'aejmac', 'aejmic', 'aejapp', 'aejpol', 'aeri',
+          'jpemic',
           'restat', 'jeea', 'eer', 'ej',
           'jep', 'jel', 'are',
           'qe', 'jeg',
@@ -272,7 +313,7 @@ def main():
         js += js_
     js_cats = {"all": js,
                "top5": ['aer', 'jpe', 'qje', 'ecta', 'restud'],
-               "general": ['aer', 'jpe', 'qje', 'ecta', 'restud', 'aeri', 'restat', 'jeea', 'eer', 'ej', 'qe'],
+               "general": ['aer', 'jpe', 'qje', 'ecta', 'restud', 'aeri', 'restat', 'jeea', 'eer', 'ej', 'qe', 'jpemic'],
                "survey": ['jep', 'jel', 'are', ]
                }
     js_cats_keys = list(js_cats.keys())
