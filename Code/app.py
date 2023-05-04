@@ -294,7 +294,6 @@ def main():
 
     js = ['aer', 'jpe', 'qje', 'ecta', 'restud',
           'aejmac', 'aejmic', 'aejapp', 'aejpol', 'aeri',
-          'jpemic',
           'restat', 'jeea', 'eer', 'ej',
           'jep', 'jel', 'are',
           'qe', 'jeg',
@@ -303,6 +302,7 @@ def main():
           'jie', 'ier', 'jpube', 'jde',
           'jeh', 'ehr',
           "jhe",
+          'jpemic',
           ]
     js_ = ["jae","geb","jinde","jlawe","jebo","ee","ectt","imfer","ecot","jmcb","jue","edcc","sje","ecoa",
             "jaere","jeem","wber","ieio","jleo","le","jpope","qme","ei","jedc","cej","obes","jems","jes","jmate",
