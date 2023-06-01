@@ -190,6 +190,7 @@ def sidebar_info():
     jme: Journal of Monetary Economics<br>
     jpe: Journal of Political Economy<br>
     jpemic: Journal of Political Economy Microeconomics<br>
+    jpemac: Journal of Political Economy Macroeconomics<br>
     jpube: Journal of Public Economics<br>
     qe: Quantitative Economics<br>
     qje: Quarterly Journal of Economics<br>
@@ -302,7 +303,7 @@ def main():
           'jie', 'ier', 'jpube', 'jde',
           'jeh', 'ehr',
           "jhe",
-          'jpemic',
+          'jpemic', 'jpemac'
           ]
     js_ = ["jae","geb","jinde","jlawe","jebo","ee","ectt","imfer","ecot","jmcb","jue","edcc","sje","ecoa",
             "jaere","jeem","wber","ieio","jleo","le","jpope","qme","ei","jedc","cej","obes","jems","jes","jmate",
@@ -313,7 +314,7 @@ def main():
         js += js_
     js_cats = {"all": js,
                "top5": ['aer', 'jpe', 'qje', 'ecta', 'restud'],
-               "general": ['aer', 'jpe', 'qje', 'ecta', 'restud', 'aeri', 'restat', 'jeea', 'eer', 'ej', 'qe', 'jpemic'],
+               "general": ['aer', 'jpe', 'qje', 'ecta', 'restud', 'aeri', 'restat', 'jeea', 'eer', 'ej', 'qe'],
                "survey": ['jep', 'jel', 'are', ]
                }
     js_cats_keys = list(js_cats.keys())
