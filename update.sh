@@ -9,5 +9,5 @@ cp Data/papers_recent.csv ../Econ-Paper-Search/Data/
 
 # commit and push in Econ-Paper-Search
 cd ../Econ-Paper-Search
-git ci -am "Monthly data update."
+git ci "Monthly data update."
 git push
