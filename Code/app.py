@@ -154,10 +154,10 @@ def sidebar_info():
     </div>
     """, unsafe_allow_html=True)
 
-    st.sidebar.header("Experimental Config")
+    st.sidebar.header("Configs")
+    full_journal = st.sidebar.checkbox("full set of journals", value=False)
     show_abstract = st.sidebar.checkbox("show abstract", value=False)
     search_author = st.sidebar.checkbox("search author", value=False)
-    full_journal = st.sidebar.checkbox("full set of journals", value=False)
     random_roll = st.sidebar.checkbox("random roll", value=False)
 
     st.sidebar.header("Journal Abbreviations")
@@ -171,7 +171,6 @@ def sidebar_info():
     aeri: AER Insights<br>
     are: Annual Review of Economics<br>
     ecta: Econometrica<br>
-    ehr: Economic History Review<br>
     ej: Economic Journal<br>
     eer: European Economic Review<br>
     ier: International Economic Review<br>
@@ -192,6 +191,7 @@ def sidebar_info():
     jpemic: Journal of Political Economy Microeconomics<br>
     jpemac: Journal of Political Economy Macroeconomics<br>
     jpube: Journal of Public Economics<br>
+    jue: Journal of Urban Economics<br>
     qe: Quantitative Economics<br>
     qje: Quarterly Journal of Economics<br>
     rand: RAND Journal of Economics<br>
@@ -209,6 +209,7 @@ def sidebar_info():
     eedur: Economics of Education Review<br>
     eeh: Explorations in Economic History<br>
     efp: Education Finance and Policy<br>
+    ehr: Economic History Review<br>
     ei: Economic Inquiry<br>
     geb: Games and Economic Behavior<br>
     imfer: IMF Economic Review<br>
@@ -227,7 +228,6 @@ def sidebar_info():
     jpemic: Journal of Political Economy and Macroeconomics<br>
     jpope: Journal of Population Economics<br>
     jru: Journal of Risk and Uncertainty<br>
-    jue: Journal of Urban Economics<br>
     jleo: Journal of Law, Economics, and Organization<br>
     jlawe: Journal of Law and Economics<br>
     jmcb: Journal of Money, Credit and Banking<br>
@@ -294,18 +294,17 @@ def main():
     # show_abstract = a3.checkbox("show abstract", value=False)
 
     js = ['aer', 'jpe', 'qje', 'ecta', 'restud',
-          'aejmac', 'aejmic', 'aejapp', 'aejpol', 'aeri',
+          'aejmac', 'aejmic', 'aejapp', 'aejpol', 'aeri', 'jpemic', 'jpemac',
           'restat', 'jeea', 'eer', 'ej',
           'jep', 'jel', 'are',
           'qe', 'jeg',
           'jet', 'te', 'joe',
           'jme', 'red', 'rand', 'jole', 'jhr',
           'jie', 'ier', 'jpube', 'jde',
-          'jeh', 'ehr',
+          'jeh',"jue",
           "jhe",
-          'jpemic', 'jpemac'
           ]
-    js_ = ["jae","geb","jinde","jlawe","jebo","ee","ectt","imfer","ecot","jmcb","jue","edcc","sje","ecoa",
+    js_ = ["jae","geb","jinde","jlawe","jebo","ee","ectt",'ehr',"imfer","ecot","jmcb","edcc","sje","ecoa",
             "jaere","jeem","wber","ieio","jleo","le","jpope","qme","ei","jedc","cej","obes","jems","jes","jmate",
             "rsue","eedur","jhc","efp","aler","jbes","jru","jpam","jfe",
             'eeh',
