@@ -327,7 +327,7 @@ def main():
         journals = set(journals)
 
     year_min = 1900
-    year_max = 2023
+    year_max = 2024
 
     c1, c2, c3, c4 = form.columns(4)
     year_begin = c1.number_input('Year from', value=1980, min_value=year_min, max_value=year_max)
