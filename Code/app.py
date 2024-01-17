@@ -177,7 +177,7 @@ def sidebar_info():
     jde: Journal of Development Economics<br>
     jeea: Journal of the European Economic Association<br>
     jeg: Journal of Economic Growth<br>
-    jel: The Journal of Economic History<br>
+    jeh: The Journal of Economic History<br>
     jel: Journal of Economic Literature<br>
     jep: Journal of Economic Perspectives<br>
     jet: Journal of Economic Theory<br>
@@ -203,7 +203,7 @@ def sidebar_info():
     aler: American Law and Economics Review<br>
     cej: Canadian Journal of Economics<br>
     ecoa: Economica<br>
-    ectt: Econometric Theory<br>
+    ecot: Econometric Theory<br>
     edcc: Economic Development and Cultural Change<br>
     ee: Experimental Economics<br>
     eedur: Economics of Education Review<br>
@@ -212,11 +212,12 @@ def sidebar_info():
     ehr: Economic History Review<br>
     ei: Economic Inquiry<br>
     geb: Games and Economic Behavior<br>
+    ijio: International Journal of Industrial Organization<br>
     imfer: IMF Economic Review<br>
     jae: Journal of Applied Econometrics<br>
     jaere: Journal of the Association of Environmental and Resource Economists<br>
     jbes: Journal of Business & Economic Statistics<br>
-    jede: Journal of Economic Dynamics and Control<br>
+    jedc: Journal of Economic Dynamics and Control<br>
     jemstr: Journal of Economics & Management Strategy<br>
     jeem: Journal of Environmental Economics and Management<br>
     jecsur: Journal of Economic Surveys<br>
