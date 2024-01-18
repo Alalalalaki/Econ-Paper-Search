@@ -18,8 +18,9 @@ def load_data_and_combine():
     df1 = pd.read_csv("Data/papers_b2000.csv", **args)
     df2 = pd.read_csv("Data/papers_2000s.csv", **args)
     df3 = pd.read_csv("Data/papers_2010s.csv", **args)
-    df4 = pd.read_csv("Data/papers_recent.csv", **args)
-    df = pd.concat([df1, df2, df3, df4], axis=0)
+    df4 = pd.read_csv("Data/papers_2015s.csv", **args)
+    df5 = pd.read_csv("Data/papers_2020s.csv", **args)
+    df = pd.concat([df1, df2, df3, df4, df5], axis=0)
     return df
 
 
@@ -200,10 +201,13 @@ def sidebar_info():
     restat: Review of Economics and Statistics<br>
     te: Theoretical Economics<br>
     <br>
+    ajhe: American Journal of Health Economics<br>
     aler: American Law and Economics Review<br>
+    bpea: Brookings Papers on Economic Activity<br>
     cej: Canadian Journal of Economics<br>
     ecoa: Economica<br>
     ecot: Econometric Theory<br>
+    er: Econometric Reviews<br>
     edcc: Economic Development and Cultural Change<br>
     ee: Experimental Economics<br>
     eedur: Economics of Education Review<br>
@@ -213,31 +217,41 @@ def sidebar_info():
     ei: Economic Inquiry<br>
     geb: Games and Economic Behavior<br>
     ijio: International Journal of Industrial Organization<br>
+    ijgt: International Journal of Game Theory<br>
     imfer: IMF Economic Review<br>
     jae: Journal of Applied Econometrics<br>
     jaere: Journal of the Association of Environmental and Resource Economists<br>
+    jbf: Journal of Banking & Finance<br>
     jbes: Journal of Business & Economic Statistics<br>
+    jdeme: Journal of Demographic Economics<br>
     jedc: Journal of Economic Dynamics and Control<br>
+    jei: Journal of Economic Inequality<br>
     jemstr: Journal of Economics & Management Strategy<br>
     jeem: Journal of Environmental Economics and Management<br>
     jecsur: Journal of Economic Surveys<br>
     jebo: Journal of Economic Behavior & Organization<br>
+    jf: Journal of Finance<br>
     jfe: Journal of Financial Economics<br>
     jhc: Journal of Housing Economics<br>
     jinde: Journal of Industrial Economics<br>
-    jpam: Journal of Policy Analysis and Management<br>
     jpemic: Journal of Political Economy and Macroeconomics<br>
     jpope: Journal of Population Economics<br>
-    jru: Journal of Risk and Uncertainty<br>
     jleo: Journal of Law, Economics, and Organization<br>
     jlawe: Journal of Law and Economics<br>
     jmcb: Journal of Money, Credit and Banking<br>
     jmate: Journal of Mathematical Economics<br>
     le: Labour Economics<br>
+    md: Macroeconomic Dynamics<br>
+    ms: Management Science<br>
     obes: Oxford Bulletin of Economics and Statistics<br>
+    oxe: Oxford Economic Papers<br>
     qme: Quantitative Marketing and Economics<br>
     rsue: Regional Science and Urban Economics<br>
+    rp: Research Policy<br>
+    rfs: Review of Financial Studies<br>
+    riw: Review of Income and Wealth<br>
     sje: Scandinavian Journal of Economics<br>
+    smj: Strategic Management Journal<br>
     wber: World Bank Economic Review<br>
     <br>
     top5: [aer+ecta+jpe+qje+restud]<br>
@@ -305,10 +319,10 @@ def main():
           'jeh',"jue",
           "jhe",
           ]
-    js_ = ["jae","geb","jinde","jlawe","jebo","ee","ectt",'ehr',"imfer","ecot","jmcb","edcc","sje","ecoa",
-            "jaere","jeem","wber","ieio","jleo","le","jpope","qme","ei","jedc","cej","obes","jems","jes","jmate",
-            "rsue","eedur","jhc","efp","aler","jbes","jru","jpam","jfe",
-            'eeh',
+    js_ = ["jae","geb","jinde","jlawe","jebo","ee","ectt",'ehr','eeh',"imfer","ecot","jmcb","edcc","sje","ecoa",
+            "jaere","jeem","wber","ijio","jleo","le","jpope","qme","ei","jedc","cej","obes","jems","jes","jmate",
+            "rsue","eedur","jhc","efp","aler","jbes", 
+            "jf","jfe","rfs","ms","jbf","smj","rp","bpea","er","ijgt","ntj","md","jdeme","oxe","jei","riw","ajhe"
             ]
     if full_journal:
         js += js_
