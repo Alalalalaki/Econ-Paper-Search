@@ -43,7 +43,7 @@ def load_data_cached(timestamp):
 
 
 def load_data():
-    update_timestamp = os.path.getmtime("Data/papers_recent.csv")
+    update_timestamp = os.path.getmtime("Data/papers_2020s.csv")
     return load_data_cached(update_timestamp)
 
 
@@ -321,7 +321,7 @@ def main():
           ]
     js_ = ["jae","geb","jinde","jlawe","jebo","ee","ectt",'ehr','eeh',"imfer","ecot","jmcb","edcc","sje","ecoa",
             "jaere","jeem","wber","ijio","jleo","le","jpope","qme","ei","jedc","cej","obes","jems","jes","jmate",
-            "rsue","eedur","jhc","efp","aler","jbes", 
+            "rsue","eedur","jhc","efp","aler","jbes",
             "jf","jfe","rfs","ms","jbf","smj","rp","bpea","er","ijgt","ntj","md","jdeme","oxe","jei","riw","ajhe"
             ]
     if full_journal:
