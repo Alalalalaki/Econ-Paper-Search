@@ -234,7 +234,6 @@ def sidebar_info():
     jfe: Journal of Financial Economics<br>
     jhc: Journal of Housing Economics<br>
     jinde: Journal of Industrial Economics<br>
-    jpemic: Journal of Political Economy and Macroeconomics<br>
     jpope: Journal of Population Economics<br>
     jleo: Journal of Law, Economics, and Organization<br>
     jlawe: Journal of Law and Economics<br>
