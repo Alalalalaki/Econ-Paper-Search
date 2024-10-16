@@ -59,7 +59,7 @@ def show_papers(df, show_abstract):
         else:
             st.markdown(f'{index+1}.  {row.title}. {row.authors}. {row.year}. {row.journal}.')
         if show_abstract:
-            with st.expander(""):
+            with st.expander("", expanded=True):
                 st.markdown(row.abstract)
 
 
