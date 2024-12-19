@@ -170,7 +170,6 @@ def sidebar_info():
     aejpol: AEJ Policy<br>
     aer: American Economic Review<br>
     aeri: AER Insights<br>
-    aerpp: AER Papers and Proceedings<br>
     are: Annual Review of Economics<br>
     ecta: Econometrica<br>
     ej: Economic Journal<br>
@@ -196,13 +195,13 @@ def sidebar_info():
     jue: Journal of Urban Economics<br>
     qe: Quantitative Economics<br>
     qje: Quarterly Journal of Economics<br>
-    nberma: NBER Macroeconomics Annual<br>
     rand: RAND Journal of Economics<br>
     red: Review of Economic Dynamics<br>
     restud: Review of Economic Studies<br>
     restat: Review of Economics and Statistics<br>
     te: Theoretical Economics<br>
     <br>
+    aerpp: AER Papers and Proceedings<br>
     ajhe: American Journal of Health Economics<br>
     aler: American Law and Economics Review<br>
     bpea: Brookings Papers on Economic Activity<br>
@@ -244,6 +243,7 @@ def sidebar_info():
     le: Labour Economics<br>
     md: Macroeconomic Dynamics<br>
     ms: Management Science<br>
+    nberma: NBER Macroeconomics Annual<br>
     obes: Oxford Bulletin of Economics and Statistics<br>
     oxe: Oxford Economic Papers<br>
     qme: Quantitative Marketing and Economics<br>
@@ -318,12 +318,13 @@ def main():
           'jme', 'red', 'rand', 'jole', 'jhr',
           'jie', 'ier', 'jpube', 'jde',
           'jeh',"jue",
-          "jhe","nberma","aerpp",
+          "jhe",
           ]
     js_ = ["jae","geb","jinde","jlawe","jebo","ee","ectt",'ehr','eeh',"imfer","ecot","jmcb","edcc","sje","ecoa",
             "jaere","jeem","wber","ijio","jleo","le","jpope","qme","ei","jedc","cej","obes","jems","jes","jmate",
             "rsue","eedur","jhc","efp","aler","jbes",
-            "jf","jfe","rfs","ms","jbf","smj","rp","bpea","er","ijgt","ntj","md","jdeme","oxe","jei","riw","ajhe"
+            "jf","jfe","rfs","ms","jbf","smj","rp","bpea","er","ijgt","ntj","md","jdeme","oxe","jei","riw","ajhe",
+            "nberma","aerpp",
             ]
     if full_journal:
         js += js_
