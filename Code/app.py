@@ -14,34 +14,58 @@ st.set_page_config(page_title=None, page_icon=None, layout='centered', initial_s
 
 """
 
+@st.cache_data  # Changed from st.cache to st.cache_data
+def load_single_file(file_path, args):
+    """Load a single CSV file with memory optimization"""
+    # Read CSV in chunks to reduce memory
+    chunks = []
+    for chunk in pd.read_csv(file_path, **args, chunksize=10000):
+        # Convert object columns to categories where possible
+        for col in chunk.select_dtypes(['object']).columns:
+            if chunk[col].nunique() / len(chunk) < 0.5:  # If less than 50% unique values
+                chunk[col] = chunk[col].astype('category')
+        chunks.append(chunk)
+    return pd.concat(chunks, ignore_index=True)
+
 
 def load_data_and_combine():
-    args = {"dtype": {"year": "Int16"}, "usecols": ["title", "authors", "abstract", "url",  "journal", "year"]}
-    df1 = pd.read_csv("Data/papers_b2000.csv", **args)
-    df2 = pd.read_csv("Data/papers_2000s.csv", **args)
-    df3 = pd.read_csv("Data/papers_2010s.csv", **args)
-    df4 = pd.read_csv("Data/papers_2015s.csv", **args)
-    df5 = pd.read_csv("Data/papers_2020s.csv", **args)
-    df = pd.concat([df1, df2, df3, df4, df5], axis=0)
-    return df
+    args = {
+        "dtype": {
+            "year": "Int16",  # Using smaller integer type
+            "journal": "category"  # Store journal as category
+        },
+        "usecols": ["title", "authors", "abstract", "url", "journal", "year"]
+    }
 
+    # Load files one by one to prevent memory spike
+    dfs = []
+    file_periods = ['b2000', '2000s', '2010s', '2015s', '2020s']
 
-@st.cache(show_spinner=False)
-def load_data_cached(timestamp):
-    df = load_data_and_combine()
+    for period in file_periods:
+        df = load_single_file(f"Data/papers_{period}.csv", args)
+        dfs.append(df)
+
+    df = pd.concat(dfs, ignore_index=True)
+
+    # Clean data
     df = df[~df.year.isna()]
-    # drop book reviews (not perfect)
-    masks = [~df.title.str.contains(i, case=False, regex=False) for i in ["pp.", " p."]]  # "pages," " pp "
-    mask = np.vstack(masks).all(axis=0)
-    df = df.loc[mask]
-    # remove line breaks in title
-    df.title = df.title.replace(r'\n', ' ', regex=True)
-    # drop some duplicates due to weird strings in authors and abstract
+
+    # Optimize string columns
+    df['title'] = df['title'].str.replace(r'\n', ' ', regex=True)
+    df['title'] = df['title'].astype('string')  # Use string dtype instead of object
+    df['authors'] = df['authors'].astype('string')
+    df['abstract'] = df['abstract'].astype('string')
+
+    # Drop duplicates and clean URLs
     df = df[~df.duplicated(['title', 'url']) | df.url.isna()]
-    # replace broken links to None
-    broken_links = ["http://hdl.handle.net/", ]
-    df.loc[df.url.isin(broken_links), "url"] = None
+    df.loc[df.url.str.contains("http://hdl.handle.net/", na=False), "url"] = None
+
     return df
+
+# REPLACE this function
+@st.cache_data  # Changed from st.cache
+def load_data_cached(timestamp):
+    return load_data_and_combine()
 
 
 def load_data():

@@ -1,33 +1,60 @@
-@charset "UTF-8";
-/* CSS Document */
-
-/* body {
-    color: #fff;
-    background-color: #4F8BF9;
-} */
-
-.stButton {
-    color: #f63366;
-    /* width: 462px; */
+/* Button styling - more specific selector for the text color */
+.stButton>button {
+    color: #f63366 !important;
+    width: auto;
 }
 
-/* stform */
-.css-12ttj6m {
-   border: 0;
-   padding: 0;
+/* Form styling */
+.stForm {
+    border: 0;
+    padding: 0;
 }
 
-.streamlit-expanderHeader {
-   border: 0;
-   padding: 0;
+/* Expander header styling */
+.streamlit-expanderHeader,
+[data-testid="stExpander"] {
+    border: 0;
+    padding: 0;
 }
 
-/* multiselect */
-.stMultiSelect span[role="presentation"] {
+/* Multiselect styling - compact items and adjust margins */
+[data-testid="stMultiSelect"] span {
     margin-left: 0px;
 }
 
-/* stcheckbox (abstract) */
-.css-1djdyxw {
+/* Make multiselect items more compact */
+[data-testid="stMultiSelect"] div[role="listbox"] {
+    line-height: 1em;
+}
+
+[data-testid="stMultiSelect"] div[role="option"] {
+    padding: 2px 8px;
+    min-height: 24px;
+}
+
+/* Checkbox styling */
+[data-testid="stCheckbox"] label {
     font-size: small;
+}
+
+/* Form border removal */
+[data-testid="stForm"] {
+    border: none;
+    padding: 0;
+}
+
+/* Additional spacing */
+.stSelectbox,
+.stMultiSelect {
+    margin-bottom: 1rem;
+}
+
+/* Text readability */
+.stMarkdown {
+    line-height: 1.5;
+}
+
+/* Compact form layout */
+div[data-testid="stForm"]>div:first-child {
+    padding-top: 0;
 }
