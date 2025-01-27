@@ -64,7 +64,7 @@ def load_data_and_combine():
     # drop some duplicates due to weird strings in authors and abstract
     df = df[~df.duplicated(['title', 'url']) | df.url.isna()]
     # replace broken links to None
-    broken_links = ["http://hdl.handle.net/", ]
+    broken_links = ["http://hdl.handle.net/", "https://hdl.handle.net/"]
     df.loc[df.url.isin(broken_links), "url"] = None
 
     return df
