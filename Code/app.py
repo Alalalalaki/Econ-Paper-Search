@@ -50,15 +50,22 @@ def load_data_and_combine():
     # Clean data
     df = df[~df.year.isna()]
 
-    # Optimize string columns
-    df['title'] = df['title'].str.replace(r'\n', ' ', regex=True)
-    df['title'] = df['title'].astype('string')  # Use string dtype instead of object
+    # Use string dtype instead of object
+    df['title'] = df['title'].astype('string')
     df['authors'] = df['authors'].astype('string')
     df['abstract'] = df['abstract'].astype('string')
 
-    # Drop duplicates and clean URLs
+    # drop book reviews (not perfect)
+    masks = [~df.title.str.contains(i, case=False, regex=False) for i in ["pp.", " p."]]  # "pages," " pp "
+    mask = np.vstack(masks).all(axis=0)
+    df = df.loc[mask]
+    # remove line breaks in title
+    df.title = df.title.replace(r'\n', ' ', regex=True)
+    # drop some duplicates due to weird strings in authors and abstract
     df = df[~df.duplicated(['title', 'url']) | df.url.isna()]
-    df.loc[df.url.str.contains("http://hdl.handle.net/", na=False), "url"] = None
+    # replace broken links to None
+    broken_links = ["http://hdl.handle.net/", ]
+    df.loc[df.url.isin(broken_links), "url"] = None
 
     return df
 
