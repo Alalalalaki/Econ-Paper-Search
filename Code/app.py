@@ -177,7 +177,7 @@ def sidebar_info():
     """, unsafe_allow_html=True)
 
     update_timestamp = os.path.getmtime("Data/papers_2020s.csv")
-    update_time_str = datetime.fromtimestamp(update_timestamp).strftime("%Y-%m-%d %H:%M:%S")
+    update_time_str = datetime.fromtimestamp(update_timestamp).strftime("%Y-%m-%d")
     st.sidebar.markdown(f"""
     <div style="font-size: small; font-style: italic;">
     Last data update: {update_time_str}<br>
