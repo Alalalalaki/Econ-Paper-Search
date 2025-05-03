@@ -14,7 +14,6 @@ st.set_page_config(page_title=None, page_icon=None, layout='centered', initial_s
 
 """
 
-@st.cache_data  # Changed from st.cache to st.cache_data
 def load_single_file(file_path, args):
     """Load a single CSV file with memory optimization"""
     # Read CSV in chunks to reduce memory
@@ -177,21 +176,13 @@ def sidebar_info():
     </div>
     """, unsafe_allow_html=True)
 
-    try:
-        update_timestamp = os.path.getmtime("Data/papers_2020s.csv")
-        update_time_str = datetime.fromtimestamp(update_timestamp).strftime("%Y-%m-%d %H:%M:%S")
-        st.sidebar.markdown(f"""
-        <div style="font-size: small; color: rgb(49, 51, 63);">
-        Last data update: <b>{update_time_str}</b><br>
-        Data source: RePEc (papers_2020s.csv)
-        </div>
-        """, unsafe_allow_html=True)
-    except:
-        st.sidebar.markdown("""
-        <div style="font-size: small; color: red;">
-        ERROR: Unable to get last update time
-        </div>
-        """, unsafe_allow_html=True)
+    update_timestamp = os.path.getmtime("Data/papers_2020s.csv")
+    update_time_str = datetime.fromtimestamp(update_timestamp).strftime("%Y-%m-%d %H:%M:%S")
+    st.sidebar.markdown(f"""
+    <div style="font-size: small; font-style: italic;">
+    Last data update: {update_time_str}<br>
+    </div>
+    """, unsafe_allow_html=True)
 
     st.sidebar.header("Search Help")
     st.sidebar.markdown("""
