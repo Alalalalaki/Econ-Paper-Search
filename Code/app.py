@@ -180,7 +180,7 @@ def sidebar_info():
     update_time_str = datetime.fromtimestamp(update_timestamp).strftime("%Y-%m-%d")
     st.sidebar.markdown(f"""
     <div style="font-size: small; font-style: italic;">
-    Last data update: {update_time_str}<br>
+    Last update: {update_time_str}<br>
     </div>
     """, unsafe_allow_html=True)
 
