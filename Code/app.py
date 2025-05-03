@@ -177,7 +177,7 @@ def sidebar_info():
     </div>
     """, unsafe_allow_html=True)
 
-   try:
+    try:
         update_timestamp = os.path.getmtime("Data/papers_2020s.csv")
         update_time_str = datetime.fromtimestamp(update_timestamp).strftime("%Y-%m-%d %H:%M:%S")
         st.sidebar.markdown(f"""
