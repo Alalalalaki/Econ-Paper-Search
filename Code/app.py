@@ -70,7 +70,7 @@ def load_data_and_combine():
 
     return df
 
-# REPLACE this function
+
 @st.cache_data  # Changed from st.cache
 def load_data_cached(timestamp):
     return load_data_and_combine()
@@ -176,6 +176,22 @@ def sidebar_info():
     <b>Author</b>: <a href="https://zhuxuanli.com" target="_blank" rel="noopener noreferrer">Xuanli Zhu</a><br>
     </div>
     """, unsafe_allow_html=True)
+
+   try:
+        update_timestamp = os.path.getmtime("Data/papers_2020s.csv")
+        update_time_str = datetime.fromtimestamp(update_timestamp).strftime("%Y-%m-%d %H:%M:%S")
+        st.sidebar.markdown(f"""
+        <div style="font-size: small; color: rgb(49, 51, 63);">
+        Last data update: <b>{update_time_str}</b><br>
+        Data source: RePEc (papers_2020s.csv)
+        </div>
+        """, unsafe_allow_html=True)
+    except:
+        st.sidebar.markdown("""
+        <div style="font-size: small; color: red;">
+        ERROR: Unable to get last update time
+        </div>
+        """, unsafe_allow_html=True)
 
     st.sidebar.header("Search Help")
     st.sidebar.markdown("""
