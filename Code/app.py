@@ -4,7 +4,8 @@ import pandas as pd
 import os
 import re
 from datetime import datetime
-
+from semantic_search import perform_semantic_search, load_semantic_model
+from data_processing import load_all_papers  # Use shared data loading
 
 
 st.set_page_config(page_title=None, page_icon=None, layout='centered', initial_sidebar_state='collapsed')
@@ -14,70 +15,77 @@ st.set_page_config(page_title=None, page_icon=None, layout='centered', initial_s
 
 """
 
-def load_single_file(file_path, args):
-    """Load a single CSV file with memory optimization"""
-    # Read CSV in chunks to reduce memory
-    chunks = []
-    for chunk in pd.read_csv(file_path, **args, chunksize=10000):
-        # Convert object columns to categories where possible
-        for col in chunk.select_dtypes(['object']).columns:
-            if chunk[col].nunique() / len(chunk) < 0.5:  # If less than 50% unique values
-                chunk[col] = chunk[col].astype('category')
-        chunks.append(chunk)
-    return pd.concat(chunks, ignore_index=True)
 
+@st.cache_data
+def load_data_cached(timestamp):
+    """Load data using the shared processing module"""
+    # Change to the correct directory if needed
+    current_dir = os.getcwd()
+    if os.path.basename(current_dir) != 'Code':
+        os.chdir('Code')
 
-def load_data_and_combine():
-    args = {
-        "dtype": {
-            "year": "Int16",  # Using smaller integer type
-            "journal": "category"  # Store journal as category
-        },
-        "usecols": ["title", "authors", "abstract", "url", "journal", "year"]
-    }
+    df = load_all_papers()
 
-    # Load files one by one to prevent memory spike
-    dfs = []
-    file_periods = ['b2000', '2000s', '2010s', '2015s', '2020s']
-
-    for period in file_periods:
-        df = load_single_file(f"Data/papers_{period}.csv", args)
-        dfs.append(df)
-
-    df = pd.concat(dfs, ignore_index=True)
-
-    # Clean data
-    df = df[~df.year.isna()]
-
-    # Use string dtype instead of object
-    df['title'] = df['title'].astype('string')
-    df['authors'] = df['authors'].astype('string')
-    df['abstract'] = df['abstract'].astype('string')
-
-    # drop book reviews (not perfect)
-    masks = [~df.title.str.contains(i, case=False, regex=False) for i in ["pp.", " p."]]  # "pages," " pp "
-    mask = np.vstack(masks).all(axis=0)
-    df = df.loc[mask]
-    # clean titles
-    df.title = df.title.str.replace(r'\n\[.*?\]', '', regex=True)
-    df.title = df.title.str.replace(r'\n', ' ', regex=True)
-    # drop some duplicates due to weird strings in authors and abstract
-    df = df[~df.duplicated(['title', 'url']) | df.url.isna()]
-    # replace broken links to None
-    broken_links = ["http://hdl.handle.net/", "https://hdl.handle.net/"]
-    df.loc[df.url.isin(broken_links), "url"] = None
+    # Change back
+    os.chdir(current_dir)
 
     return df
 
 
-@st.cache_data  # Changed from st.cache
-def load_data_cached(timestamp):
-    return load_data_and_combine()
-
-
 def load_data():
+    """Load data with caching based on file modification time"""
     update_timestamp = os.path.getmtime("Data/papers_2020s.csv")
     return load_data_cached(update_timestamp)
+
+
+@st.cache_data
+def load_embeddings_cached(timestamp):
+    """Load embeddings in the exact same order as papers were processed during generation."""
+    all_embeddings = []
+
+    for period in ['b2000_part1', 'b2000_part2', '2000s', '2010s', '2015s', '2020s']:
+        path = f'Embeddings/embeddings_{period}.npy'
+        if os.path.exists(path):
+            embeddings = np.load(path).astype(np.float32)
+            all_embeddings.append(embeddings)
+
+    # Concatenate all embeddings in order
+    if all_embeddings:
+        return np.vstack(all_embeddings)
+    else:
+        return None
+
+
+def load_embeddings():
+    """Load embeddings with caching based on file modification time"""
+    update_timestamp = os.path.getmtime("Embeddings/embeddings_2020s.npy")
+    return load_embeddings_cached(update_timestamp)
+
+
+def load_and_validate_embeddings(search_mode, df):
+    """Load embeddings for AI mode and validate they match the dataframe"""
+    if search_mode != "AI":
+        return None
+
+    with st.spinner('Loading AI model...'):
+        embeddings = load_embeddings()
+        if embeddings is None:
+            st.error("Embeddings not found! Please run generate_embeddings.py first.")
+            return None
+
+        # Check for dimension mismatch
+        if len(embeddings) != len(df):
+            st.error(f"⚠️ Data mismatch detected!")
+            st.error(f"Papers in database: {len(df):,}")
+            st.error(f"Embeddings loaded: {len(embeddings):,}")
+            st.error("Please regenerate embeddings by running: python generate_embeddings.py")
+            st.info("This happens when the data cleaning process has changed. The embeddings must be regenerated to match the current data.")
+            return None
+
+        # Pre-load the model
+        _ = load_semantic_model()
+
+    return embeddings
 
 
 def local_css(file_name):
@@ -105,9 +113,9 @@ def search_keywords(
         data_load_state.markdown('Searching paper...')
 
         # preliminary select on
-        mask_jounral = df.journal.isin(journals)
+        mask_journal = df.journal.isin(journals)
         mask_year = (df.year >= year_begin) & (df.year <= year_end)
-        dt = df.loc[mask_jounral & mask_year]
+        dt = df.loc[mask_journal & mask_year]
         info = dt.title + ' ' + dt.abstract.fillna('')
         if search_author:
             info = info + ' ' + dt.authors
@@ -116,7 +124,6 @@ def search_keywords(
         if (' ' in key_words) & ("\"" not in key_words):
             # the case of \s but no ""
             key_words = key_words.split(' ')
-            # key_words = ''.join([f'(?=.*{i})' for i in key_words_list])
         else:
             if "\"" in key_words:
                 # the case of ""
@@ -147,9 +154,8 @@ def search_keywords(
         dt = dt.loc[mask]
 
         # sort
-        sort_map = {'Most recent': ['year', False], 'Most early': ['year', True], }  # 'Most cited': 'cite'
-        # can use double sort: [sort_map[sort_mth], 'journal'], ascending=[False, True]
-        dt = dt.sort_values(sort_map[sort_mth][0], ascending=sort_map[sort_mth][1]).reset_index()
+        sort_map = {'Most recent': ['year', False], 'Most early': ['year', True], }
+        dt = dt.sort_values(sort_map[sort_mth][0], ascending=sort_map[sort_mth][1]).reset_index(drop=True)
 
         # show results
         if random_roll:
@@ -158,16 +164,91 @@ def search_keywords(
         else:
             data_load_state.markdown(f'**{dt.shape[0]} Papers Found**')
             show_papers(dt.head(int(max_show)), show_abstract)
-    # else:
-    #     data_load_state = data_load_state.markdown('**10 Random Papers**')
-    #     dr = df.sample(10).reset_index()
-    #     show_papers(dr)
+
+
+def search_semantic(
+        button_clicked,
+        df, embeddings, data_load_state,
+        query, journals, year_begin, year_end, sort_mth, min_similarity, max_show,
+        show_abstract, random_roll):
+    """Handle semantic search"""
+    if button_clicked:
+        if not query.strip() and not random_roll:
+            data_load_state.markdown('Please enter a search query for AI search.')
+            return
+
+        data_load_state.markdown('Searching papers using AI...')
+
+        # Pre-filter by journal and year
+        mask_journal = df.journal.isin(journals)
+        mask_year = (df.year >= year_begin) & (df.year <= year_end)
+        mask = mask_journal & mask_year
+
+        # Filter BOTH dataframe and embeddings using the same mask
+        filtered_df = df[mask].copy()
+        filtered_embeddings = embeddings[mask]
+
+        if len(filtered_df) == 0:
+            data_load_state.markdown('**No papers found in selected journals/years**')
+            return
+
+        # Handle random roll
+        if random_roll:
+            data_load_state.markdown(f'**Roll From {filtered_df.shape[0]} Papers**')
+            show_papers(filtered_df.sample(1), show_abstract)
+            return
+
+        try:
+            # Perform semantic search with filtered data and embeddings
+            results = perform_semantic_search(query, filtered_df, filtered_embeddings, min_similarity)
+
+            if len(results) == 0:
+                data_load_state.markdown(f'**No papers found with similarity ≥ {min_similarity:.2f}**')
+                data_load_state.markdown('Try lowering the similarity threshold or using different query terms.')
+                return
+
+            # Sort results based on user preference
+            if sort_mth == 'Most recent':
+                results = results.sort_values(['year', 'similarity'], ascending=[False, False])
+            elif sort_mth == 'Most early':
+                results = results.sort_values(['year', 'similarity'], ascending=[True, False])
+            else:  # Best match
+                results = results.sort_values('similarity', ascending=False)
+
+            # Reset index to ensure correct numbering
+            results = results.reset_index(drop=True)
+
+            # Get total results before limiting
+            total_results = len(results)
+
+            # Limit to max_show
+            results = results.head(int(max_show))
+
+            # Show results with similarity scores
+            data_load_state.markdown(f'**{total_results} Papers Found** (similarity ≥ {min_similarity:.2f})')
+
+            # Custom display with similarity scores
+            for idx, (_, row) in enumerate(results.iterrows()):
+                similarity_badge = f'<span style="background-color: #4CAF50; color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.8em;">{row.similarity:.3f}</span>'
+
+                if row.url:
+                    st.markdown(f'{idx+1}. {similarity_badge} [{row.title}]({row.url}). {row.authors}. {row.year}. {row.journal}.', unsafe_allow_html=True)
+                else:
+                    st.markdown(f'{idx+1}. {similarity_badge} {row.title}. {row.authors}. {row.year}. {row.journal}.', unsafe_allow_html=True)
+
+                if show_abstract:
+                    with st.expander("", expanded=True):
+                        st.markdown(row.abstract)
+
+        except Exception as e:
+            data_load_state.markdown(f'**Error in AI search: {str(e)}**')
+            st.error("Please make sure embeddings are generated. Run generate_embeddings.py in the Code directory.")
 
 
 def sidebar_info():
     st.sidebar.header("About")
     st.sidebar.markdown("""
-    <div style="font-size: small; font-style: italic">
+    <div style="font-size: small;">
     This is a simple app to search for <b>economics papers</b> on leading economics journals.<br>
     It allows to <b>smart search</b> for only economics papers with selection of the set of economics jounrals.<br>
     The data is gathered from <b>RePEc</b> and will be <b>updated monthly (at 1st)</b>.<br>
@@ -184,23 +265,60 @@ def sidebar_info():
     </div>
     """, unsafe_allow_html=True)
 
-    st.sidebar.header("Search Help")
-    st.sidebar.markdown("""
-    <div style="font-size: small; font-style: italic"">
-    - The search looks for the papers with title and abstract that contain <b>all of the keywords</b> (split by space).<br>
-    - The search does not distinguish between full words and <b>parts of words</b>.<br>
-    - The search is <b>case insensitive</b>.<br>
-    - The search allows for using double-quotes "" to find the <b>exact phrases</b> (with space inside).<br>
-    - The search allows for using | between multiply words (no spaces) to match <b>either words</b>.<br>
-    - The search will return all papers of the selected journals if the keywords are <b>blank</b>.<br>
-    </div>
-    """, unsafe_allow_html=True)
-
     st.sidebar.header("Configs")
+
+    # Create columns for search mode and min similarity
+    col1, col2 = st.sidebar.columns([1.5, 1])
+
+    with col1:
+        search_mode = st.radio("Search Mode", ["Keyword", "AI"], index=0, horizontal=True,
+                              help="AI mode is powered by large language model (all-MiniLM-L6-v2) and uses semantic similarity to find related papers")
+
+    # Min similarity number input (only for AI mode)
+    min_similarity = 0.5  # default
+    if search_mode == "AI":
+        with col2:
+            min_similarity = st.number_input('Min Sim',
+                                           min_value=0.0,
+                                           max_value=1.0,
+                                           value=0.5,
+                                           step=0.05,
+                                           format="%.2f",
+                                           help="Minimum similarity threshold")
+
     full_journal = st.sidebar.checkbox("full set of journals", value=False)
     show_abstract = st.sidebar.checkbox("show abstract", value=False)
-    search_author = st.sidebar.checkbox("search author", value=False)
-    random_roll = st.sidebar.checkbox("random roll", value=False)
+    search_author = st.sidebar.checkbox("search author", value=False,
+                                       disabled=(search_mode == "AI"),
+                                       help="Author search is only available in Keyword mode")
+    random_roll = st.sidebar.checkbox("random roll", value=False,
+                                     disabled=(search_mode == "AI"),
+                                     help="Random roll is only available in Keyword mode")
+
+    # Conditional Search Help based on mode
+    if search_mode == "Keyword":
+        st.sidebar.header("Search Help (Keyword)")
+        st.sidebar.markdown("""
+        <div style="font-size: small;">
+        - The search looks for the papers with title and abstract that contain <b>all of the keywords</b> (split by space).<br>
+        - The search does not distinguish between full words and <b>parts of words</b>.<br>
+        - The search is <b>case insensitive</b>.<br>
+        - The search allows for using double-quotes "" to find the <b>exact phrases</b> (with space inside).<br>
+        - The search allows for using | between multiply words (no spaces) to match <b>either words</b>.<br>
+        - The search will return all papers of the selected journals if the keywords are <b>blank</b>.<br>
+        </div>
+        """, unsafe_allow_html=True)
+    else:  # AI mode
+        st.sidebar.header("Search Help (AI)")
+        st.sidebar.markdown("""
+        <div style="font-size: small;">
+        - Use <b>natural language queries</b> to find semantically related papers.<br>
+        - <b>Full phrases and sentences</b> work better than individual keywords.<br>
+        - <b>Word order</b> matters; the same words in different contexts carry different meanings.<br>
+        - <b>Examples</b>: "impact of minimum wage on employment in asian countries" or "impact of firm wage premium on wage inequality".<br>
+        - The <b>similarity threshold</b> filters results: 0.5 is a rule of thumb.<br>
+        </div>
+        """, unsafe_allow_html=True)
 
     st.sidebar.header("Journal Abbreviations")
     st.sidebar.markdown("""
@@ -309,46 +427,55 @@ def sidebar_info():
     </div>
     """, unsafe_allow_html=True)
 
-    return show_abstract, search_author, random_roll, full_journal
+    return show_abstract, search_author, random_roll, full_journal, search_mode, min_similarity
 
 
-def hide_right_menu():
-    # ref: https://discuss.streamlit.io/t/how-do-i-hide-remove-the-menu-in-production/362/3
-    hide_streamlit_style = """
+def apply_custom_css(hide_menu=True):
+    """Apply custom CSS including optional menu hiding"""
+    hide_menu_style = """
     <style>
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     </style>
+    """ if hide_menu else """
+    <style>
+    footer {visibility: hidden;}
+    </style>
     """
-    st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+    st.markdown(hide_menu_style, unsafe_allow_html=True)
 
 
 def main():
-    show_abstract, search_author, random_roll, full_journal = sidebar_info()
-    # st.text(os.getcwd())
-    hide_right_menu()
+    show_abstract, search_author, random_roll, full_journal, search_mode, min_similarity = sidebar_info()
+    apply_custom_css(hide_menu=True)  # Set to False to show menu
 
     local_css("Code/style.css")
+
+    # Load data
+    df = load_data()
+
+    # Load and validate embeddings if needed
+    embeddings = load_and_validate_embeddings(search_mode, df)
 
     form = st.form(key='search')
 
     if not random_roll:
-        key_words = form.text_input('Keywords in Title and Abstract')
+        if search_mode == "AI":
+            key_words = form.text_input('Search Query (describe what you are looking for)')
+        else:
+            key_words = form.text_input('Keywords in Title and Abstract')
         button_label = 'Search'
     else:
         key_words = ""
-        button_label = 'Roll a rondom paper'
+        button_label = 'Roll a random paper'
 
-    a1, a2 = form.columns([1.08, 1]) # 1.53 without " & configs!"
+    a1, a2 = form.columns([1.18, 1])
     button_clicked = a1.form_submit_button(label=button_label)
     a2.markdown(
         """<div style="color: green; font-size: small; padding-bottom: 0;">
-        (see left sidebar for search help & journal abbrevs & <font color="blue">configs</font>!)
+        (see left sidebar for search help & <font color="blue">new config of AI search</font>!)
         </div>""",
         unsafe_allow_html=True)
-
-    # alternatively add show abstract here
-    # show_abstract = a3.checkbox("show abstract", value=False)
 
     js = ['aer', 'jpe', 'qje', 'ecta', 'restud',
           'aejmac', 'aejmic', 'aejapp', 'aejpol', 'aeri', 'jpemic', 'jpemac',
@@ -376,7 +503,7 @@ def main():
                }
     js_cats_keys = list(js_cats.keys())
     journals = form.multiselect("Journals",
-                                js_cats_keys+js, js)  # js[:21] //
+                                js_cats_keys+js, js)
     # if selected journals include js_cats
     js_temp = set(journals) & set(js_cats_keys)
     if js_temp:
@@ -390,17 +517,29 @@ def main():
     c1, c2, c3, c4 = form.columns(4)
     year_begin = c1.number_input('Year from', value=1980, min_value=year_min, max_value=year_max)
     year_end = c2.number_input('Year to', value=year_max, min_value=year_min, max_value=year_max)
-    sort_mth = c3.selectbox('Sort by', ['Most recent', 'Most early'], index=0)  # 'Most cited'
+
+    # Sort option for both modes
+    if search_mode == "AI":
+        sort_options = ['Most recent', 'Most early', 'Best match']
+        sort_mth = c3.selectbox('Sort by', sort_options, index=0)
+    else:
+        sort_mth = c3.selectbox('Sort by', ['Most recent', 'Most early'], index=0)
+
     max_show = c4.number_input('Max. Shown', value=100, min_value=0, max_value=500)
 
     data_load_state = st.empty()
 
-    df = load_data()
-
-    search_keywords(button_clicked,
-                    df, data_load_state,
-                    key_words, journals, year_begin, year_end, sort_mth, max_show,
-                    show_abstract, search_author, random_roll)
+    # Call appropriate search function based on mode
+    if search_mode == "AI":
+        search_semantic(button_clicked,
+                       df, embeddings, data_load_state,
+                       key_words, journals, year_begin, year_end, sort_mth, min_similarity, max_show,
+                       show_abstract, random_roll)
+    else:
+        search_keywords(button_clicked,
+                       df, data_load_state,
+                       key_words, journals, year_begin, year_end, sort_mth, max_show,
+                       show_abstract, search_author, random_roll)
 
 
 if __name__ == '__main__':
