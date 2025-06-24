@@ -5,6 +5,8 @@ import os
 import re
 from datetime import datetime
 from data_processing import load_all_papers  # Use shared data loading
+import time
+import logging
 
 
 st.set_page_config(page_title=None, page_icon=None, layout='centered', initial_sidebar_state='collapsed')
@@ -446,15 +448,34 @@ def apply_custom_css(hide_menu=True):
     """
     st.markdown(hide_menu_style, unsafe_allow_html=True)
 
+# Configure logging to make it visible in Streamlit Cloud logs
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
 
 def main():
+    # ==================== PROFILING START ====================
+    script_start_time = time.time()
+    logging.info("PROFILING: Script run started.")
+    # =========================================================
+
+    # --- Profile Sidebar ---
+    sidebar_start_time = time.time()
     show_abstract, search_author, random_roll, full_journal, search_mode, min_similarity = sidebar_info()
-    apply_custom_css(hide_menu=True)  # Set to False to show menu
+    logging.info(f"PROFILING: sidebar_info() took: {time.time() - sidebar_start_time:.4f} seconds.")
+    # -----------------------
 
+    # --- Profile CSS ---
+    css_start_time = time.time()
+    apply_custom_css(hide_menu=True)
     local_css("Code/style.css")
+    logging.info(f"PROFILING: CSS loading took: {time.time() - css_start_time:.4f} seconds.")
+    # -------------------
 
+    # --- Profile Form Definition ---
+    form_def_start_time = time.time()
     form = st.form(key='search')
-
     if not random_roll:
         if search_mode == "AI":
             key_words = form.text_input('Search Query (describe what you are looking for)')
@@ -473,58 +494,35 @@ def main():
         </div>""",
         unsafe_allow_html=True)
 
-    js = ['aer', 'jpe', 'qje', 'ecta', 'restud',
-          'aejmac', 'aejmic', 'aejapp', 'aejpol', 'aeri', 'jpemic', 'jpemac',
-          'restat', 'jeea', 'eer', 'ej',
-          'jep', 'jel', 'are',
-          'qe', 'jeg',
-          'jet', 'te', 'joe',
-          'jme', 'red', 'rand', 'jole', 'jhr',
-          'jie', 'ier', 'jpube', 'jde',
-          'jeh',"jue",
-          "jhe",
-          ]
-    js_ = ["jae","geb","jinde","jlawe","jebo","ee","ectt",'ehr','eeh',"imfer","ecot","jmcb","edcc","sje","ecoa",
-            "jaere","jeem","wber","ijio","jleo","le","jpope","qme","ei","jedc","cej","obes","jems","jes","jmate",
-            "rsue","eedur","jhc","efp","aler","jbes",
-            "jf","jfe","rfs","ms","jbf","smj","rp","bpea","er","ijgt","ntj","md","jdeme","oxe","jei","riw","ajhe",
-            "nberma","aerpp",
-            ]
-    if full_journal:
-        js += js_
-    js_cats = {"all": js,
-               "top5": ['aer', 'jpe', 'qje', 'ecta', 'restud'],
-               "general": ['aer', 'jpe', 'qje', 'ecta', 'restud', 'aeri', 'restat', 'jeea', 'eer', 'ej', 'qe'],
-               "survey": ['jep', 'jel', 'are', ]
-               }
+    # ... (the rest of your form definition code for journals, years, etc.) ...
+    js = ['aer', 'jpe', 'qje', 'ecta', 'restud', 'aejmac', 'aejmic', 'aejapp', 'aejpol', 'aeri', 'jpemic', 'jpemac', 'restat', 'jeea', 'eer', 'ej', 'jep', 'jel', 'are', 'qe', 'jeg', 'jet', 'te', 'joe', 'jme', 'red', 'rand', 'jole', 'jhr', 'jie', 'ier', 'jpube', 'jde', 'jeh',"jue", "jhe"]
+    js_ = ["jae","geb","jinde","jlawe","jebo","ee","ectt",'ehr','eeh',"imfer","ecot","jmcb","edcc","sje","ecoa", "jaere","jeem","wber","ijio","jleo","le","jpope","qme","ei","jedc","cej","obes","jems","jes","jmate", "rsue","eedur","jhc","efp","aler","jbes", "jf","jfe","rfs","ms","jbf","smj","rp","bpea","er","ijgt","ntj","md","jdeme","oxe","jei","riw","ajhe", "nberma","aerpp"]
+    if full_journal: js += js_
+    js_cats = {"all": js, "top5": ['aer', 'jpe', 'qje', 'ecta', 'restud'], "general": ['aer', 'jpe', 'qje', 'ecta', 'restud', 'aeri', 'restat', 'jeea', 'eer', 'ej', 'qe'], "survey": ['jep', 'jel', 'are', ]}
     js_cats_keys = list(js_cats.keys())
-    journals = form.multiselect("Journals",
-                                js_cats_keys+js, js)
-    # if selected journals include js_cats
-    js_temp = set(journals) & set(js_cats_keys)
-    if js_temp:
-        for c in js_temp:
-            journals += js_cats[c]
+    journals = form.multiselect("Journals", js_cats_keys+js, js)
+    if set(journals) & set(js_cats_keys):
+        for c in set(journals) & set(js_cats_keys): journals += js_cats[c]
         journals = set(journals)
-
     year_min = 1900
     year_max = datetime.now().year
-
     c1, c2, c3, c4 = form.columns(4)
     year_begin = c1.number_input('Year from', value=1980, min_value=year_min, max_value=year_max)
     year_end = c2.number_input('Year to', value=year_max, min_value=year_min, max_value=year_max)
-
-    # Sort option for both modes
     if search_mode == "AI":
         sort_options = ['Most recent', 'Most early', 'Best match']
         sort_mth = c3.selectbox('Sort by', sort_options, index=0)
     else:
         sort_mth = c3.selectbox('Sort by', ['Most recent', 'Most early'], index=0)
-
     max_show = c4.number_input('Max. Shown', value=100, min_value=0, max_value=500)
+    logging.info(f"PROFILING: Form definition took: {time.time() - form_def_start_time:.4f} seconds.")
+    # -----------------------------
 
-    # Load data
+    # --- Profile Data Loading (THE CRITICAL PART) ---
+    data_load_start_time = time.time()
     df = load_data()
+    logging.info(f"PROFILING: load_data() took: {time.time() - data_load_start_time:.4f} seconds. DataFrame shape: {df.shape}")
+    # -----------------------------------------------
 
     data_load_state = st.empty()
 
@@ -539,6 +537,104 @@ def main():
                        df, data_load_state,
                        key_words, journals, year_begin, year_end, sort_mth, max_show,
                        show_abstract, search_author, random_roll)
+
+    # ===================== PROFILING END =====================
+    logging.info(f"PROFILING: Total script run took: {time.time() - script_start_time:.4f} seconds.")
+    # =========================================================
+
+
+# def main():
+#     show_abstract, search_author, random_roll, full_journal, search_mode, min_similarity = sidebar_info()
+#     apply_custom_css(hide_menu=True)  # Set to False to show menu
+
+#     local_css("Code/style.css")
+
+#     form = st.form(key='search')
+
+#     if not random_roll:
+#         if search_mode == "AI":
+#             key_words = form.text_input('Search Query (describe what you are looking for)')
+#         else:
+#             key_words = form.text_input('Keywords in Title and Abstract')
+#         button_label = 'Search'
+#     else:
+#         key_words = ""
+#         button_label = 'Roll a random paper'
+
+#     a1, a2 = form.columns([1.18, 1])
+#     button_clicked = a1.form_submit_button(label=button_label)
+#     a2.markdown(
+#         """<div style="color: green; font-size: small; padding-bottom: 0;">
+#         (see left sidebar for search help & <font color="blue">new config of AI search</font>!)
+#         </div>""",
+#         unsafe_allow_html=True)
+
+#     js = ['aer', 'jpe', 'qje', 'ecta', 'restud',
+#           'aejmac', 'aejmic', 'aejapp', 'aejpol', 'aeri', 'jpemic', 'jpemac',
+#           'restat', 'jeea', 'eer', 'ej',
+#           'jep', 'jel', 'are',
+#           'qe', 'jeg',
+#           'jet', 'te', 'joe',
+#           'jme', 'red', 'rand', 'jole', 'jhr',
+#           'jie', 'ier', 'jpube', 'jde',
+#           'jeh',"jue",
+#           "jhe",
+#           ]
+#     js_ = ["jae","geb","jinde","jlawe","jebo","ee","ectt",'ehr','eeh',"imfer","ecot","jmcb","edcc","sje","ecoa",
+#             "jaere","jeem","wber","ijio","jleo","le","jpope","qme","ei","jedc","cej","obes","jems","jes","jmate",
+#             "rsue","eedur","jhc","efp","aler","jbes",
+#             "jf","jfe","rfs","ms","jbf","smj","rp","bpea","er","ijgt","ntj","md","jdeme","oxe","jei","riw","ajhe",
+#             "nberma","aerpp",
+#             ]
+#     if full_journal:
+#         js += js_
+#     js_cats = {"all": js,
+#                "top5": ['aer', 'jpe', 'qje', 'ecta', 'restud'],
+#                "general": ['aer', 'jpe', 'qje', 'ecta', 'restud', 'aeri', 'restat', 'jeea', 'eer', 'ej', 'qe'],
+#                "survey": ['jep', 'jel', 'are', ]
+#                }
+#     js_cats_keys = list(js_cats.keys())
+#     journals = form.multiselect("Journals",
+#                                 js_cats_keys+js, js)
+#     # if selected journals include js_cats
+#     js_temp = set(journals) & set(js_cats_keys)
+#     if js_temp:
+#         for c in js_temp:
+#             journals += js_cats[c]
+#         journals = set(journals)
+
+#     year_min = 1900
+#     year_max = datetime.now().year
+
+#     c1, c2, c3, c4 = form.columns(4)
+#     year_begin = c1.number_input('Year from', value=1980, min_value=year_min, max_value=year_max)
+#     year_end = c2.number_input('Year to', value=year_max, min_value=year_min, max_value=year_max)
+
+#     # Sort option for both modes
+#     if search_mode == "AI":
+#         sort_options = ['Most recent', 'Most early', 'Best match']
+#         sort_mth = c3.selectbox('Sort by', sort_options, index=0)
+#     else:
+#         sort_mth = c3.selectbox('Sort by', ['Most recent', 'Most early'], index=0)
+
+#     max_show = c4.number_input('Max. Shown', value=100, min_value=0, max_value=500)
+
+#     # Load data
+#     df = load_data()
+
+#     data_load_state = st.empty()
+
+#     # Call appropriate search function based on mode
+#     if search_mode == "AI":
+#         search_semantic(button_clicked,
+#                        df, data_load_state,
+#                        key_words, journals, year_begin, year_end, sort_mth, min_similarity, max_show,
+#                        show_abstract, random_roll)
+#     else:
+#         search_keywords(button_clicked,
+#                        df, data_load_state,
+#                        key_words, journals, year_begin, year_end, sort_mth, max_show,
+#                        show_abstract, search_author, random_roll)
 
 
 if __name__ == '__main__':
