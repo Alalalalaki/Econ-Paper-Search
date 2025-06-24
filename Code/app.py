@@ -7,7 +7,7 @@ from datetime import datetime
 from data_processing import load_all_papers  # Use shared data loading
 
 
-st.set_page_config(page_title=None, page_icon=None, layout='centered', initial_sidebar_state='collapsed')
+st.set_page_config(page_title="Econ Paper Search", page_icon=None, layout='centered', initial_sidebar_state='auto')
 
 """
 # Econ Paper Search
@@ -270,7 +270,7 @@ def sidebar_info():
     st.sidebar.header("Configs")
 
     # Create columns for search mode and min similarity
-    col1, col2 = st.sidebar.columns([1.5, 1])
+    col1, col2 = st.sidebar.columns([1, 1])
 
     with col1:
         search_mode = st.radio("Search Mode", ["Keyword", "AI"], index=0, horizontal=True,
@@ -432,15 +432,11 @@ def sidebar_info():
     return show_abstract, search_author, random_roll, full_journal, search_mode, min_similarity
 
 
-def apply_custom_css(hide_menu=True):
+def apply_custom_css():
     """Apply custom CSS including optional menu hiding"""
     hide_menu_style = """
     <style>
     #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    </style>
-    """ if hide_menu else """
-    <style>
     footer {visibility: hidden;}
     </style>
     """
@@ -449,7 +445,7 @@ def apply_custom_css(hide_menu=True):
 
 def main():
     show_abstract, search_author, random_roll, full_journal, search_mode, min_similarity = sidebar_info()
-    apply_custom_css(hide_menu=True)  # Set to False to show menu
+    apply_custom_css()  # Set to False to show menu
 
     local_css("Code/style.css")
 
