@@ -272,7 +272,7 @@ def sidebar_info():
 
     with col1:
         search_mode = st.radio("Search Mode", ["Keyword", "AI"], index=0, horizontal=True,
-                              help="AI mode is powered by large language model (all-MiniLM-L6-v2) and uses semantic similarity to find related papers")
+                              help="AI mode is powered by a small language embedding model (all-MiniLM-L6-v2) and uses semantic similarity to find related papers")
 
     # Min similarity number input (only for AI mode)
     min_similarity = 0.5  # default
@@ -451,12 +451,6 @@ def main():
 
     local_css("Code/style.css")
 
-    # Load data
-    df = load_data()
-
-    # Load and validate embeddings if needed
-    embeddings = load_and_validate_embeddings(search_mode, df)
-
     form = st.form(key='search')
 
     if not random_roll:
@@ -526,6 +520,12 @@ def main():
         sort_mth = c3.selectbox('Sort by', ['Most recent', 'Most early'], index=0)
 
     max_show = c4.number_input('Max. Shown', value=100, min_value=0, max_value=500)
+
+    # Load data
+    df = load_data()
+
+    # Load and validate embeddings if needed
+    embeddings = load_and_validate_embeddings(search_mode, df)
 
     data_load_state = st.empty()
 
