@@ -18,16 +18,7 @@ st.set_page_config(page_title="Econ Paper Search", page_icon=None, layout='cente
 @st.cache_data
 def load_data_cached(timestamp):
     """Load data using the shared processing module"""
-    # Change to the correct directory if needed
-    current_dir = os.getcwd()
-    if os.path.basename(current_dir) != 'Code':
-        os.chdir('Code')
-
     df = load_all_papers()
-
-    # Change back
-    os.chdir(current_dir)
-
     return df
 
 

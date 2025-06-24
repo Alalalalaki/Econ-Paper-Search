@@ -96,7 +96,7 @@ def load_all_papers():
     file_periods = ['b2000', '2000s', '2010s', '2015s', '2020s']
 
     for period in file_periods:
-        file_path = f"../Data/papers_{period}.csv"
+        file_path = f"Data/papers_{period}.csv"
         if os.path.exists(file_path):
             logger.info(f"Loading {period}...")
             df = load_single_file(file_path)
