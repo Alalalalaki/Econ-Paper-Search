@@ -435,8 +435,8 @@ def apply_custom_css():
 
 
 def main():
+    apply_custom_css() 
     show_abstract, search_author, random_roll, full_journal, search_mode, min_similarity = sidebar_info()
-    apply_custom_css()  # Set to False to show menu
 
     local_css("Code/style.css")
 
