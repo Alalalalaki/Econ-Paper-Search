@@ -7,7 +7,7 @@ from datetime import datetime
 from data_processing import load_all_papers  # Use shared data loading
 
 
-st.set_page_config(page_title="Econ Paper Search", page_icon=None, layout='centered', initial_sidebar_state='expanded')
+st.set_page_config(page_title="Econ Paper Search", page_icon=None, layout='centered', initial_sidebar_state='auto')
 
 """
 # Econ Paper Search
