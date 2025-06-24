@@ -12,7 +12,8 @@ def load_semantic_model():
     """Load sentence transformer model once and cache"""
     # Lazy import to avoid loading heavy dependencies at module level
     from sentence_transformers import SentenceTransformer
-    return SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+    model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+    return model
 
 
 def perform_semantic_search(query, filtered_df, filtered_embeddings, min_similarity=0.0):
