@@ -1,16 +1,17 @@
 """
-Simplified semantic search - receives pre-filtered data and embeddings.
+Optimized semantic search with lazy loading to improve startup performance.
 """
 
 import numpy as np
 import pandas as pd
 import streamlit as st
-from sentence_transformers import SentenceTransformer
 
 
 @st.cache_resource
 def load_semantic_model():
     """Load sentence transformer model once and cache"""
+    # Lazy import to avoid loading heavy dependencies at module level
+    from sentence_transformers import SentenceTransformer
     return SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 
 
@@ -30,7 +31,7 @@ def perform_semantic_search(query, filtered_df, filtered_embeddings, min_similar
     if len(filtered_df) == 0 or not query.strip():
         return pd.DataFrame()
 
-    # Load model
+    # Load model (cached after first load)
     model = load_semantic_model()
 
     # Encode query

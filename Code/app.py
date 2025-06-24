@@ -4,7 +4,8 @@ import pandas as pd
 import os
 import re
 from datetime import datetime
-from semantic_search import perform_semantic_search, load_semantic_model
+# Lazy import semantic_search to avoid loading heavy dependencies
+# from semantic_search import perform_semantic_search, load_semantic_model  # REMOVED
 from data_processing import load_all_papers  # Use shared data loading
 
 
@@ -39,6 +40,17 @@ def load_data():
 
 
 @st.cache_data
+def check_embeddings_exist():
+    """Check if embeddings files exist - cached to avoid repeated file checks"""
+    periods = ['b2000_part1', 'b2000_part2', '2000s', '2010s', '2015s', '2020s']
+    for period in periods:
+        path = f'Embeddings/embeddings_{period}.npy'
+        if not os.path.exists(path):
+            return False
+    return True
+
+
+@st.cache_data
 def load_embeddings_cached(timestamp):
     """Load embeddings in the exact same order as papers were processed during generation."""
     all_embeddings = []
@@ -62,30 +74,10 @@ def load_embeddings():
     return load_embeddings_cached(update_timestamp)
 
 
-def load_and_validate_embeddings(search_mode, df):
-    """Load embeddings for AI mode and validate they match the dataframe"""
-    if search_mode != "AI":
-        return None
-
-    with st.spinner('Loading AI model...'):
-        embeddings = load_embeddings()
-        if embeddings is None:
-            st.error("Embeddings not found! Please run generate_embeddings.py first.")
-            return None
-
-        # Check for dimension mismatch
-        if len(embeddings) != len(df):
-            st.error(f"⚠️ Data mismatch detected!")
-            st.error(f"Papers in database: {len(df):,}")
-            st.error(f"Embeddings loaded: {len(embeddings):,}")
-            st.error("Please regenerate embeddings by running: python generate_embeddings.py")
-            st.info("This happens when the data cleaning process has changed. The embeddings must be regenerated to match the current data.")
-            return None
-
-        # Pre-load the model
-        _ = load_semantic_model()
-
-    return embeddings
+def lazy_load_semantic_search():
+    """Lazy load semantic search module only when needed"""
+    from semantic_search import perform_semantic_search, load_semantic_model
+    return perform_semantic_search, load_semantic_model
 
 
 def local_css(file_name):
@@ -168,7 +160,7 @@ def search_keywords(
 
 def search_semantic(
         button_clicked,
-        df, embeddings, data_load_state,
+        df, data_load_state,
         query, journals, year_begin, year_end, sort_mth, min_similarity, max_show,
         show_abstract, random_roll):
     """Handle semantic search"""
@@ -184,9 +176,8 @@ def search_semantic(
         mask_year = (df.year >= year_begin) & (df.year <= year_end)
         mask = mask_journal & mask_year
 
-        # Filter BOTH dataframe and embeddings using the same mask
+        # Filter dataframe
         filtered_df = df[mask].copy()
-        filtered_embeddings = embeddings[mask]
 
         if len(filtered_df) == 0:
             data_load_state.markdown('**No papers found in selected journals/years**')
@@ -198,7 +189,35 @@ def search_semantic(
             show_papers(filtered_df.sample(1), show_abstract)
             return
 
+        # Now load embeddings and model only when actually needed
         try:
+            # Check if embeddings exist
+            if not check_embeddings_exist():
+                st.error("Embeddings not found! Please run generate_embeddings.py first.")
+                return
+
+            # Load embeddings
+            with st.spinner('Loading embeddings...'):
+                embeddings = load_embeddings()
+                if embeddings is None:
+                    st.error("Failed to load embeddings!")
+                    return
+
+                # Check for dimension mismatch
+                if len(embeddings) != len(df):
+                    st.error(f"⚠️ Data mismatch detected!")
+                    st.error(f"Papers in database: {len(df):,}")
+                    st.error(f"Embeddings loaded: {len(embeddings):,}")
+                    st.error("Please regenerate embeddings by running: python generate_embeddings.py")
+                    return
+
+                # Filter embeddings using the same mask
+                filtered_embeddings = embeddings[mask]
+
+            # Lazy load semantic search functions
+            with st.spinner('Loading AI model...'):
+                perform_semantic_search, load_semantic_model = lazy_load_semantic_search()
+
             # Perform semantic search with filtered data and embeddings
             results = perform_semantic_search(query, filtered_df, filtered_embeddings, min_similarity)
 
@@ -524,15 +543,12 @@ def main():
     # Load data
     df = load_data()
 
-    # Load and validate embeddings if needed
-    embeddings = load_and_validate_embeddings(search_mode, df)
-
     data_load_state = st.empty()
 
     # Call appropriate search function based on mode
     if search_mode == "AI":
         search_semantic(button_clicked,
-                       df, embeddings, data_load_state,
+                       df, data_load_state,
                        key_words, journals, year_begin, year_end, sort_mth, min_similarity, max_show,
                        show_abstract, random_roll)
     else:
