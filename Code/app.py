@@ -4,8 +4,6 @@ import pandas as pd
 import os
 import re
 from datetime import datetime
-# Lazy import semantic_search to avoid loading heavy dependencies
-# from semantic_search import perform_semantic_search, load_semantic_model  # REMOVED
 from data_processing import load_all_papers  # Use shared data loading
 
 
@@ -37,17 +35,6 @@ def load_data():
     """Load data with caching based on file modification time"""
     update_timestamp = os.path.getmtime("Data/papers_2020s.csv")
     return load_data_cached(update_timestamp)
-
-
-@st.cache_data
-def check_embeddings_exist():
-    """Check if embeddings files exist - cached to avoid repeated file checks"""
-    periods = ['b2000_part1', 'b2000_part2', '2000s', '2010s', '2015s', '2020s']
-    for period in periods:
-        path = f'Embeddings/embeddings_{period}.npy'
-        if not os.path.exists(path):
-            return False
-    return True
 
 
 @st.cache_data
@@ -191,10 +178,6 @@ def search_semantic(
 
         # Now load embeddings and model only when actually needed
         try:
-            # Check if embeddings exist
-            if not check_embeddings_exist():
-                st.error("Embeddings not found! Please run generate_embeddings.py first.")
-                return
 
             # Load embeddings
             with st.spinner('Loading embeddings...'):
