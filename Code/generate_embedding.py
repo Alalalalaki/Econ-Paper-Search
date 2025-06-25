@@ -15,8 +15,6 @@ import json
 from tqdm import tqdm
 import logging
 
-# Add parent directory to path to import data_processing
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from data_processing import load_all_papers
 
 # Setup logging
@@ -77,7 +75,7 @@ def main():
 
     # Load all papers using shared processing
     logger.info("Loading all papers using shared data processing...")
-    df_all = load_all_papers()
+    df_all = load_all_papers(data_dir="../Data")
     logger.info(f"Total papers loaded: {len(df_all)}")
 
     # Dictionary to store all metadata

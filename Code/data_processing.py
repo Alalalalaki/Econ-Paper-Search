@@ -78,7 +78,7 @@ def clean_papers(df):
     return df
 
 
-def load_all_papers():
+def load_all_papers(data_dir="Data"):
     """
     Load and clean all papers in the correct order.
     This exactly replicates the load_data_and_combine() function from app.py
@@ -96,7 +96,7 @@ def load_all_papers():
     file_periods = ['b2000', '2000s', '2010s', '2015s', '2020s']
 
     for period in file_periods:
-        file_path = f"Data/papers_{period}.csv"
+        file_path = f"{data_dir}/papers_{period}.csv"
         if os.path.exists(file_path):
             logger.info(f"Loading {period}...")
             df = load_single_file(file_path)

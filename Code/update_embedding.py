@@ -19,8 +19,6 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 from tqdm import tqdm
 
-# Add parent directory to path to import data_processing
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from data_processing import load_single_file, clean_papers
 
 # Setup logging
