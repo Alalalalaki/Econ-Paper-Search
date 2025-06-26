@@ -51,6 +51,12 @@ def perform_semantic_search(query, filtered_df, filtered_embeddings, min_similar
     results = filtered_df[mask].copy()
     results['similarity'] = similarities[mask]
 
+    # Filter out papers without abstracts or with very short abstracts
+    has_valid_abstract = results['abstract'].apply(
+        lambda x: pd.notna(x) and len(str(x).strip()) > 50
+    )
+    results = results[has_valid_abstract]
+
     # Sort by similarity (descending)
     results = results.sort_values('similarity', ascending=False)
 
