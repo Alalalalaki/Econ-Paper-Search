@@ -6,6 +6,8 @@ import re
 from datetime import datetime
 from data_processing import load_all_papers  # Use shared data loading
 
+import logging
+logging.getLogger('streamlit.watcher.local_sources_watcher').setLevel(logging.ERROR)
 
 st.set_page_config(page_title="Econ Paper Search", page_icon=None, layout='centered', initial_sidebar_state='auto')
 
@@ -435,7 +437,7 @@ def apply_custom_css():
 
 
 def main():
-    apply_custom_css() 
+    apply_custom_css()
     show_abstract, search_author, random_roll, full_journal, search_mode, min_similarity = sidebar_info()
 
     local_css("Code/style.css")
