@@ -1,9 +1,9 @@
 {
   "model_name": "sentence-transformers/all-MiniLM-L6-v2",
   "embedding_dim": 384,
-  "creation_date": "2025-06-24T06:46:52.844674",
-  "last_update": "2025-07-01T17:20:33.242168",
-  "total_papers": 204398,
+  "creation_date": "2025-07-01T17:34:13.903591",
+  "last_update": "2025-07-01T17:34:13.903595",
+  "total_papers": 204392,
   "note": "b2000 embeddings are split by index (not year) to maintain order and stay under 50MB",
   "embedding_structure": [
     "b2000_part1",
@@ -42,12 +42,10 @@
       "year_range": "2015-2019"
     },
     "2020s": {
-      "num_papers": 37771,
-      "file_size_mb": 27.6644287109375,
-      "year_range": "2020-2025",
-      "source_csv": "papers_2020s.csv",
-      "creation_date": "2025-07-01T17:20:33.242073"
+      "num_papers": 37765,
+      "file_size_mb": 27.6600341796875,
+      "year_range": "2020-2025"
     }
   },
-  "total_size_mb": 149.706298828125
+  "total_size_mb": 149.701904296875
 }
