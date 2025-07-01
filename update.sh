@@ -13,6 +13,7 @@ cp Data/papers_2020s.csv ../Econ-Paper-Search/Data/
 echo "Updating embeddings for modified data..."
 cd ../Econ-Paper-Search/Code
 python update_embedding.py
+python test_embedding_consistency.py
 
 # Go back to repo root
 cd ..
