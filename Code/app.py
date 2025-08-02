@@ -445,10 +445,7 @@ def main():
     form = st.form(key='search')
 
     if not random_roll:
-        if search_mode == "AI":
-            key_words = form.text_input('Search Query (describe what you are looking for)')
-        else:
-            key_words = form.text_input('Keywords in Title and Abstract')
+        key_words = form.text_input('Search Query')
         button_label = 'Search'
     else:
         key_words = ""
