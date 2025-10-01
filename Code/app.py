@@ -199,7 +199,7 @@ def search_semantic(
 
             if len(results) == 0:
                 data_load_state.markdown(f'**No papers found with similarity ≥ {min_similarity:.2f}**')
-                data_load_state.markdown('Try lowering the similarity threshold or using different query terms.')
+                data_load_state.markdown('💭 Try lowering the similarity threshold or enriching your query terms.')
                 return
 
             # Sort results based on user preference
