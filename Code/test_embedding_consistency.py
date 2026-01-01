@@ -25,7 +25,7 @@ def load_embeddings_like_app():
     """
     all_embeddings = []
 
-    for period in ['b2000_part1', 'b2000_part2', '2000s', '2010s', '2015s', '2020s']:
+    for period in ['b2000_part1', 'b2000_part2', '2000s', '2010s', '2015s', '2020s', '2025s']:
         path = f'../Embeddings/embeddings_{period}.npy'
         if os.path.exists(path):
             embeddings = np.load(path).astype(np.float32)
@@ -49,6 +49,7 @@ def verify_embedding_files():
         'embeddings_2010s.npy',
         'embeddings_2015s.npy',
         'embeddings_2020s.npy',
+        'embeddings_2025s.npy',
         'overall_metadata.json'
     ]
 
@@ -137,7 +138,8 @@ def check_embedding_consistency():
             '2000s': len(df[(df.year >= 2000) & (df.year < 2010)]),
             '2010s': len(df[(df.year >= 2010) & (df.year < 2015)]),
             '2015s': len(df[(df.year >= 2015) & (df.year < 2020)]),
-            '2020s': len(df[df.year >= 2020])
+            '2020s': len(df[(df.year >= 2020) & (df.year < 2025)]),
+            '2025s': len(df[df.year >= 2025])
         }
 
         # For b2000, we need to check both parts
@@ -152,7 +154,7 @@ def check_embedding_consistency():
             print(f"   ✅ b2000: {b2000_total} papers (part1: {expected_part1}, part2: {expected_part2})")
 
         # Check other periods
-        for period in ['2000s', '2010s', '2015s', '2020s']:
+        for period in ['2000s', '2010s', '2015s', '2020s', '2025s']:
             expected = metadata['files'].get(period, {}).get('num_papers', 0)
             actual = actual_counts[period]
             if expected != actual:
@@ -199,13 +201,13 @@ def check_embedding_consistency():
         embedding_times = {}
 
         # Get CSV modification times
-        for period in ['b2000', '2000s', '2010s', '2015s', '2020s']:
+        for period in ['b2000', '2000s', '2010s', '2015s', '2020s', '2025s']:
             csv_path = f'../Data/papers_{period}.csv'
             if os.path.exists(csv_path):
                 csv_times[period] = os.path.getmtime(csv_path)
 
         # Get embedding modification times
-        for period in ['b2000_part1', 'b2000_part2', '2000s', '2010s', '2015s', '2020s']:
+        for period in ['b2000_part1', 'b2000_part2', '2000s', '2010s', '2015s', '2020s', '2025s']:
             emb_path = f'../Embeddings/embeddings_{period}.npy'
             if os.path.exists(emb_path):
                 embedding_times[period] = os.path.getmtime(emb_path)
@@ -257,7 +259,7 @@ def diagnose_mismatch():
 
     # Load each CSV file individually
     csv_counts = {}
-    for period in ['b2000', '2000s', '2010s', '2015s', '2020s']:
+    for period in ['b2000', '2000s', '2010s', '2015s', '2020s', '2025s']:
         csv_path = f'../Data/papers_{period}.csv'
         if os.path.exists(csv_path):
             df = pd.read_csv(csv_path)
@@ -274,7 +276,7 @@ def diagnose_mismatch():
     # Check embedding counts
     print("\nEmbedding file counts:")
     embedding_counts = {}
-    for period in ['b2000_part1', 'b2000_part2', '2000s', '2010s', '2015s', '2020s']:
+    for period in ['b2000_part1', 'b2000_part2', '2000s', '2010s', '2015s', '2020s', '2025s']:
         path = f'../Embeddings/embeddings_{period}.npy'
         if os.path.exists(path):
             embeddings = np.load(path)

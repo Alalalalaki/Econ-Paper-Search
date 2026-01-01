@@ -7,7 +7,7 @@ git pull
 
 # Move data file
 echo "Copying updated paper data..."
-cp Data/papers_2020s.csv ../Econ-Paper-Search/Data/
+cp Data/papers_2025s.csv ../Econ-Paper-Search/Data/
 
 # Update embeddings for modified files
 echo "Updating embeddings for modified data..."

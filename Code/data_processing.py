@@ -93,7 +93,7 @@ def load_all_papers(data_dir="Data"):
 
     # Load files one by one to prevent memory spike
     dfs = []
-    file_periods = ['b2000', '2000s', '2010s', '2015s', '2020s']
+    file_periods = ['b2000', '2000s', '2010s', '2015s', '2020s', '2025s']
 
     for period in file_periods:
         file_path = f"{data_dir}/papers_{period}.csv"

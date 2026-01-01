@@ -1,9 +1,9 @@
 """
 Update embeddings for modified data files.
 
-For efficiency, when only papers_2020s.csv is modified (the common case for monthly updates),
+For efficiency, when only papers_2025s.csv is modified (the common case for monthly updates),
 the script generates embeddings only for newly added papers rather than regenerating all embeddings.
-This works because update.py prepends new papers to the beginning of papers_2020s.csv.
+This works because update.py prepends new papers to the beginning of papers_2025s.csv.
 
 For other files or multiple file changes, the script performs full regeneration to ensure
 consistency with cross-file duplicate removal.
@@ -87,7 +87,7 @@ def check_which_files_need_update():
     files_to_update = []
 
     # CSV file periods (what actually exists in Data/)
-    csv_periods = ['b2000', '2000s', '2010s', '2015s', '2020s']
+    csv_periods = ['b2000', '2000s', '2010s', '2015s', '2020s', '2025s']
 
     logger.info("Checking for modified files...")
     logger.info("="*60)
@@ -145,12 +145,12 @@ def check_which_files_need_update():
     return files_to_update
 
 
-def efficient_update_2020s(updater, metadata):
+def efficient_update_2025s(updater, metadata):
     """
-    Update embeddings for 2020s papers by processing only newly added entries.
+    Update embeddings for 2025s papers by processing only newly added entries.
 
     This function leverages the fact that update.py prepends new papers to the
-    beginning of papers_2020s.csv. It loads existing embeddings and only generates
+    beginning of papers_2025s.csv. It loads existing embeddings and only generates
     new ones for the papers that were added, then concatenates them in the correct order.
 
     Args:
@@ -160,33 +160,33 @@ def efficient_update_2020s(updater, metadata):
     Returns:
         bool: True if update was performed, False if no new papers found
     """
-    logger.info("\nPerforming efficient update for 2020s papers...")
+    logger.info("\nPerforming efficient update for 2025s papers...")
 
     # Load all papers to ensure consistent duplicate removal across files
     df_all = load_all_papers(data_dir="../Data")
 
-    # Extract papers for the specific year range
-    df_2020s = df_all[df_all.year >= 2020].copy()
-    current_count = len(df_2020s)
+    # Extract papers for the specific year range (2025+)
+    df_2025s = df_all[df_all.year >= 2025].copy()
+    current_count = len(df_2025s)
 
     # Get previous count from metadata
-    previous_count = metadata['files'].get('2020s', {}).get('num_papers', 0)
+    previous_count = metadata['files'].get('2025s', {}).get('num_papers', 0)
 
     if current_count == previous_count:
-        logger.info("No new papers in 2020s. Skipping update.")
+        logger.info("No new papers in 2025s. Skipping update.")
         return False
 
     new_paper_count = current_count - previous_count
-    logger.info(f"Found {new_paper_count} new papers in 2020s")
+    logger.info(f"Found {new_paper_count} new papers in 2025s")
 
     # Load existing embeddings
-    embeddings_path = '../Embeddings/embeddings_2020s.npy'
+    embeddings_path = '../Embeddings/embeddings_2025s.npy'
     if os.path.exists(embeddings_path) and previous_count > 0:
         logger.info("Loading existing embeddings...")
         existing_embeddings = np.load(embeddings_path).astype(np.float32)
 
         # New papers are at the beginning of the dataframe due to update.py's prepend logic
-        df_new_papers = df_2020s.iloc[:new_paper_count]
+        df_new_papers = df_2025s.iloc[:new_paper_count]
 
         # Generate embeddings only for new papers
         logger.info(f"Generating embeddings for {new_paper_count} new papers...")
@@ -199,7 +199,7 @@ def efficient_update_2020s(updater, metadata):
     else:
         # All papers are new - generate embeddings for entire dataset
         logger.info("No existing embeddings found. Generating all embeddings...")
-        all_embeddings = updater.create_embeddings(df_2020s)
+        all_embeddings = updater.create_embeddings(df_2025s)
 
     # Save updated embeddings
     embeddings_float16 = all_embeddings.astype(np.float16)
@@ -207,17 +207,17 @@ def efficient_update_2020s(updater, metadata):
 
     # Update metadata with additional tracking for efficient updates
     file_size = os.path.getsize(embeddings_path) / (1024 * 1024)
-    metadata['files']['2020s'] = {
+    metadata['files']['2025s'] = {
         'num_papers': current_count,
         'file_size_mb': file_size,
-        'year_range': f'{df_2020s.year.min()}-{df_2020s.year.max()}',
-        'source_csv': 'papers_2020s.csv',
+        'year_range': f'{df_2025s.year.min()}-{df_2025s.year.max()}',
+        'source_csv': 'papers_2025s.csv',
         'creation_date': datetime.now().isoformat(),
         'last_efficient_update': datetime.now().isoformat(),  # Track when efficient update was used
         'papers_added': new_paper_count  # Track incremental additions
     }
 
-    logger.info(f"✓ Updated embeddings_2020s.npy: {file_size:.1f} MB")
+    logger.info(f"✓ Updated embeddings_2025s.npy: {file_size:.1f} MB")
     logger.info(f"  Previous papers: {previous_count}")
     logger.info(f"  Current papers: {current_count}")
     logger.info(f"  New papers added: {new_paper_count}")
@@ -244,14 +244,14 @@ def update_embeddings(csv_files_to_update):
     # Track what we updated
     updated_embeddings = []
 
-    # Determine if only 2020s needs updating (common case for monthly updates)
-    if csv_files_to_update == ['2020s']:
-        # Use efficient update path for 2020s
-        if efficient_update_2020s(updater, metadata):
-            updated_embeddings.append('2020s')
+    # Determine if only 2025s needs updating (common case for monthly updates)
+    if csv_files_to_update == ['2025s']:
+        # Use efficient update path for 2025s
+        if efficient_update_2025s(updater, metadata):
+            updated_embeddings.append('2025s')
     else:
-        # Full regeneration required when multiple files changed or non-2020s files modified
-        logger.info("\nPerforming full regeneration (non-2020s files were modified)...")
+        # Full regeneration required when multiple files changed or non-2025s files modified
+        logger.info("\nPerforming full regeneration (non-2025s files were modified)...")
 
         # Load ALL papers together to handle cross-file duplicate removal properly
         # This ensures consistency with how the app loads data
@@ -319,7 +319,8 @@ def update_embeddings(csv_files_to_update):
                     '2000s': (2000, 2010),
                     '2010s': (2010, 2015),
                     '2015s': (2015, 2020),
-                    '2020s': (2020, 3000)
+                    '2020s': (2020, 2025),
+                    '2025s': (2025, 3000)
                 }
 
                 if csv_period in year_ranges:
@@ -330,11 +331,11 @@ def update_embeddings(csv_files_to_update):
                         logger.warning(f"No papers found for {csv_period}")
                         continue
 
-                    # The efficient path for 2020s applies even in full regeneration mode
-                    if csv_period == '2020s':
+                    # The efficient path for 2025s applies even in full regeneration mode
+                    if csv_period == '2025s':
                         # Still use efficient method if possible
-                        if efficient_update_2020s(updater, metadata):
-                            updated_embeddings.append('2020s')
+                        if efficient_update_2025s(updater, metadata):
+                            updated_embeddings.append('2025s')
                         continue
 
                     # Create embeddings for other periods

@@ -26,7 +26,8 @@ def load_data_cached(timestamp):
 
 def load_data():
     """Load data with caching based on file modification time"""
-    update_timestamp = os.path.getmtime("Data/papers_2020s.csv")
+    # Use papers_2025s.csv as it's the active file that gets updated monthly
+    update_timestamp = os.path.getmtime("Data/papers_2025s.csv")
     return load_data_cached(update_timestamp)
 
 
@@ -35,7 +36,7 @@ def load_embeddings_cached(timestamp):
     """Load embeddings in the exact same order as papers were processed during generation."""
     all_embeddings = []
 
-    for period in ['b2000_part1', 'b2000_part2', '2000s', '2010s', '2015s', '2020s']:
+    for period in ['b2000_part1', 'b2000_part2', '2000s', '2010s', '2015s', '2020s', '2025s']:
         path = f'Embeddings/embeddings_{period}.npy'
         if os.path.exists(path):
             embeddings = np.load(path).astype(np.float32)
@@ -50,7 +51,8 @@ def load_embeddings_cached(timestamp):
 
 def load_embeddings():
     """Load embeddings with caching based on file modification time"""
-    update_timestamp = os.path.getmtime("Embeddings/embeddings_2020s.npy")
+    # Use embeddings_2025s.npy as it's the active file that gets updated monthly
+    update_timestamp = os.path.getmtime("Embeddings/embeddings_2025s.npy")
     return load_embeddings_cached(update_timestamp)
 
 
@@ -252,7 +254,7 @@ def sidebar_info():
     </div>
     """, unsafe_allow_html=True)
 
-    update_timestamp = os.path.getmtime("Data/papers_2020s.csv")
+    update_timestamp = os.path.getmtime("Data/papers_2025s.csv")
     update_time_str = datetime.fromtimestamp(update_timestamp).strftime("%Y-%m-%d")
     st.sidebar.markdown(f"""
     <div style="font-size: small; font-style: italic;">
