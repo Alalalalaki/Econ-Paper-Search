@@ -38,6 +38,10 @@ def perform_semantic_search(query, filtered_df, filtered_embeddings, min_similar
     # Encode query
     query_embedding = model.encode([query], normalize_embeddings=True)[0]
 
+    # Cast filtered subset to float32 for accurate dot product
+    # (full array stays as float16 in memory to save ~150MB)
+    filtered_embeddings = filtered_embeddings.astype(np.float32)
+
     # Compute similarities for all filtered embeddings
     similarities = np.dot(filtered_embeddings, query_embedding)
 

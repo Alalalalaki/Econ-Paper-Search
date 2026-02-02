@@ -17,9 +17,10 @@ st.set_page_config(page_title="Econ Paper Search", page_icon=None, layout='cente
 """
 
 
-@st.cache_data
+@st.cache_resource
 def load_data_cached(timestamp):
-    """Load data using the shared processing module"""
+    """Load data using the shared processing module.
+    Uses cache_resource to avoid serialization copy overhead (data is read-only)."""
     df = load_all_papers()
     return df
 
@@ -31,18 +32,20 @@ def load_data():
     return load_data_cached(update_timestamp)
 
 
-@st.cache_data
+@st.cache_resource
 def load_embeddings_cached(timestamp):
-    """Load embeddings in the exact same order as papers were processed during generation."""
+    """Load embeddings in the exact same order as papers were processed during generation.
+    Uses cache_resource to avoid serialization copy overhead (data is read-only).
+    Keeps float16 to halve memory; filtered subsets are cast to float32 at search time."""
     all_embeddings = []
 
     for period in ['b2000_part1', 'b2000_part2', '2000s', '2010s', '2015s', '2020s', '2025s']:
         path = f'Embeddings/embeddings_{period}.npy'
         if os.path.exists(path):
-            embeddings = np.load(path).astype(np.float32)
+            embeddings = np.load(path, mmap_mode='r')
             all_embeddings.append(embeddings)
 
-    # Concatenate all embeddings in order
+    # Concatenate all embeddings in order (stays float16)
     if all_embeddings:
         return np.vstack(all_embeddings)
     else:
