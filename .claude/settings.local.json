@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:docs.streamlit.io)",
+      "Bash(sort:*)",
+      "WebFetch(domain:blog.streamlit.io)"
+    ]
+  }
+}
