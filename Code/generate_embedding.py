@@ -86,7 +86,7 @@ def main():
         'last_update': datetime.now().isoformat(),
         'total_papers': len(df_all),
         'note': 'b2000 embeddings are split by index (not year) to maintain order and stay under 50MB',
-        'embedding_structure': ['b2000_part1', 'b2000_part2', '2000s', '2010s', '2015s', '2020s'],
+        'embedding_structure': ['b2000_part1', 'b2000_part2', '2000s', '2010s', '2015s', '2020s', '2025s'],
         'files': {}
     }
 
@@ -112,7 +112,9 @@ def main():
             'num_papers': len(df_b2000_part1),
             'file_size_mb': file_size_part1,
             'year_range': f'{df_b2000_part1.year.min()}-{df_b2000_part1.year.max()}',
-            'index_range': f'0-{split_index-1} of b2000'
+            'index_range': f'0-{split_index-1} of b2000',
+            'source_csv': 'papers_b2000.csv',
+            'creation_date': datetime.now().isoformat(),
         }
         logger.info(f"Saved embeddings_b2000_part1.npy: {file_size_part1:.1f} MB")
 
@@ -128,7 +130,9 @@ def main():
             'num_papers': len(df_b2000_part2),
             'file_size_mb': file_size_part2,
             'year_range': f'{df_b2000_part2.year.min()}-{df_b2000_part2.year.max()}',
-            'index_range': f'{split_index}-{len(df_b2000)-1} of b2000'
+            'index_range': f'{split_index}-{len(df_b2000)-1} of b2000',
+            'source_csv': 'papers_b2000.csv',
+            'creation_date': datetime.now().isoformat(),
         }
         logger.info(f"Saved embeddings_b2000_part2.npy: {file_size_part2:.1f} MB")
 
@@ -137,7 +141,8 @@ def main():
         ('2000s', 2000, 2010),
         ('2010s', 2010, 2015),
         ('2015s', 2015, 2020),
-        ('2020s', 2020, 3000)  # Large upper bound
+        ('2020s', 2020, 2025),
+        ('2025s', 2025, 3000),
     ]
 
     for period_name, year_start, year_end in periods:
@@ -154,7 +159,9 @@ def main():
             all_metadata['files'][period_name] = {
                 'num_papers': len(df_period),
                 'file_size_mb': file_size,
-                'year_range': f'{df_period.year.min()}-{df_period.year.max()}'
+                'year_range': f'{df_period.year.min()}-{df_period.year.max()}',
+                'source_csv': f'papers_{period_name}.csv',
+                'creation_date': datetime.now().isoformat(),
             }
             logger.info(f"Saved {output_path}: {file_size:.1f} MB")
 
@@ -173,7 +180,7 @@ def main():
     logger.info(f"Total size: {all_metadata['total_size_mb']:.1f} MB")
     logger.info(f"Model used: {MODEL_NAME}")
     logger.info(f"Output format: NPY (float16)")
-    logger.info(f"Embedding files: b2000_part1, b2000_part2, 2000s, 2010s, 2015s, 2020s")
+    logger.info(f"Embedding files: b2000_part1, b2000_part2, 2000s, 2010s, 2015s, 2020s, 2025s")
     logger.info(f"{'='*60}")
 
     # Check file sizes

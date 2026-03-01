@@ -1,12 +1,10 @@
 """
 Update embeddings for modified data files.
 
-For efficiency, when only papers_2025s.csv is modified (the common case for monthly updates),
-the script generates embeddings only for newly added papers rather than regenerating all embeddings.
-This works because update.py prepends new papers to the beginning of papers_2025s.csv.
-
-For other files or multiple file changes, the script performs full regeneration to ensure
-consistency with cross-file duplicate removal.
+For each modified CSV, the script generates embeddings only for newly added papers
+rather than regenerating all embeddings. This works because update.py prepends new
+papers to the beginning of each CSV file, so new papers appear at the start of each
+period's subset after deduplication.
 """
 
 import os
@@ -145,88 +143,122 @@ def check_which_files_need_update():
     return files_to_update
 
 
-def efficient_update_2025s(updater, metadata):
+YEAR_RANGES = {
+    'b2000': (None, 2000),
+    '2000s': (2000, 2010),
+    '2010s': (2010, 2015),
+    '2015s': (2015, 2020),
+    '2020s': (2020, 2025),
+    '2025s': (2025, None),
+}
+
+
+def filter_period(df_all, period_name):
+    """Filter the full dataframe to a specific year-range period."""
+    year_start, year_end = YEAR_RANGES[period_name]
+    if year_start is None:
+        return df_all[df_all.year < year_end]
+    elif year_end is None:
+        return df_all[df_all.year >= year_start]
+    else:
+        return df_all[(df_all.year >= year_start) & (df_all.year < year_end)]
+
+
+def efficient_update_period(updater, metadata, df_all, period_name):
     """
-    Update embeddings for 2025s papers by processing only newly added entries.
+    Efficiently update embeddings for a single period by generating embeddings
+    only for newly added papers. Works for any period, not just 2025s.
 
-    This function leverages the fact that update.py prepends new papers to the
-    beginning of papers_2025s.csv. It loads existing embeddings and only generates
-    new ones for the papers that were added, then concatenates them in the correct order.
+    New papers are at the beginning of each period's subset because update.py
+    prepends them to the CSV files.
 
-    Args:
-        updater: EmbeddingUpdater instance
-        metadata: Dictionary containing embedding metadata
+    For b2000 (split into two .npy files): generates new embeddings, combines
+    with existing part1+part2, and re-splits at the new midpoint — no existing
+    embeddings are regenerated, just reshuffled.
 
     Returns:
-        bool: True if update was performed, False if no new papers found
+        list: embedding file names that were updated, or empty list if nothing changed
     """
-    logger.info("\nPerforming efficient update for 2025s papers...")
+    df_period = filter_period(df_all, period_name)
+    current_count = len(df_period)
 
-    # Load all papers to ensure consistent duplicate removal across files
-    df_all = load_all_papers(data_dir="../Data")
-
-    # Extract papers for the specific year range (2025+)
-    df_2025s = df_all[df_all.year >= 2025].copy()
-    current_count = len(df_2025s)
+    if current_count == 0:
+        logger.warning(f"No papers found for {period_name}")
+        return []
 
     # Get previous count from metadata
-    previous_count = metadata['files'].get('2025s', {}).get('num_papers', 0)
+    if period_name == 'b2000':
+        previous_count = (metadata['files'].get('b2000_part1', {}).get('num_papers', 0)
+                          + metadata['files'].get('b2000_part2', {}).get('num_papers', 0))
+    else:
+        previous_count = metadata['files'].get(period_name, {}).get('num_papers', 0)
 
     if current_count == previous_count:
-        logger.info("No new papers in 2025s. Skipping update.")
-        return False
+        logger.info(f"  {period_name}: no new papers, skipping")
+        return []
 
     new_paper_count = current_count - previous_count
-    logger.info(f"Found {new_paper_count} new papers in 2025s")
+    logger.info(f"\n{period_name}: {new_paper_count} new papers ({previous_count} → {current_count})")
 
-    # Load existing embeddings
-    embeddings_path = '../Embeddings/embeddings_2025s.npy'
-    if os.path.exists(embeddings_path) and previous_count > 0:
-        logger.info("Loading existing embeddings...")
-        existing_embeddings = np.load(embeddings_path).astype(np.float32)
+    # New papers are at the beginning due to prepend convention
+    df_new = df_period.iloc[:new_paper_count]
+    new_embeddings = updater.create_embeddings(df_new)
 
-        # New papers are at the beginning of the dataframe due to update.py's prepend logic
-        df_new_papers = df_2025s.iloc[:new_paper_count]
+    now = datetime.now().isoformat()
 
-        # Generate embeddings only for new papers
-        logger.info(f"Generating embeddings for {new_paper_count} new papers...")
-        new_embeddings = updater.create_embeddings(df_new_papers)
+    if period_name == 'b2000':
+        # Load existing part1 and part2, combine with new, re-split
+        existing_part1 = np.load('../Embeddings/embeddings_b2000_part1.npy').astype(np.float32)
+        existing_part2 = np.load('../Embeddings/embeddings_b2000_part2.npy').astype(np.float32)
+        all_embeddings = np.vstack([new_embeddings, existing_part1, existing_part2])
 
-        # Maintain correct order: new embeddings first, then existing
-        all_embeddings = np.vstack([new_embeddings, existing_embeddings])
+        split_index = len(all_embeddings) // 2
+        np.save('../Embeddings/embeddings_b2000_part1.npy', all_embeddings[:split_index].astype(np.float16))
+        np.save('../Embeddings/embeddings_b2000_part2.npy', all_embeddings[split_index:].astype(np.float16))
 
-        logger.info(f"Combined embeddings shape: {all_embeddings.shape}")
+        for part, count, idx_start in [('b2000_part1', split_index, 0),
+                                        ('b2000_part2', len(all_embeddings) - split_index, split_index)]:
+            file_size = os.path.getsize(f'../Embeddings/embeddings_{part}.npy') / (1024 * 1024)
+            metadata['files'][part] = {
+                'num_papers': count,
+                'file_size_mb': file_size,
+                'year_range': f'{df_period.year.min()}-{df_period.year.max()}',
+                'index_range': f'{idx_start}-{idx_start + count - 1} of b2000',
+                'source_csv': 'papers_b2000.csv',
+                'creation_date': now,
+                'papers_added': new_paper_count,
+            }
+            logger.info(f"  ✓ embeddings_{part}.npy: {count} papers, {file_size:.1f} MB")
+
+        return ['b2000_part1', 'b2000_part2']
+
     else:
-        # All papers are new - generate embeddings for entire dataset
-        logger.info("No existing embeddings found. Generating all embeddings...")
-        all_embeddings = updater.create_embeddings(df_2025s)
+        # Single-file period: stack [new, existing] and save
+        embeddings_path = f'../Embeddings/embeddings_{period_name}.npy'
+        if os.path.exists(embeddings_path) and previous_count > 0:
+            existing = np.load(embeddings_path).astype(np.float32)
+            all_embeddings = np.vstack([new_embeddings, existing])
+        else:
+            all_embeddings = new_embeddings
 
-    # Save updated embeddings
-    embeddings_float16 = all_embeddings.astype(np.float16)
-    np.save(embeddings_path, embeddings_float16)
+        np.save(embeddings_path, all_embeddings.astype(np.float16))
 
-    # Update metadata with additional tracking for efficient updates
-    file_size = os.path.getsize(embeddings_path) / (1024 * 1024)
-    metadata['files']['2025s'] = {
-        'num_papers': current_count,
-        'file_size_mb': file_size,
-        'year_range': f'{df_2025s.year.min()}-{df_2025s.year.max()}',
-        'source_csv': 'papers_2025s.csv',
-        'creation_date': datetime.now().isoformat(),
-        'last_efficient_update': datetime.now().isoformat(),  # Track when efficient update was used
-        'papers_added': new_paper_count  # Track incremental additions
-    }
+        file_size = os.path.getsize(embeddings_path) / (1024 * 1024)
+        metadata['files'][period_name] = {
+            'num_papers': current_count,
+            'file_size_mb': file_size,
+            'year_range': f'{df_period.year.min()}-{df_period.year.max()}',
+            'source_csv': f'papers_{period_name}.csv',
+            'creation_date': now,
+            'papers_added': new_paper_count,
+        }
+        logger.info(f"  ✓ embeddings_{period_name}.npy: {current_count} papers, {file_size:.1f} MB")
 
-    logger.info(f"✓ Updated embeddings_2025s.npy: {file_size:.1f} MB")
-    logger.info(f"  Previous papers: {previous_count}")
-    logger.info(f"  Current papers: {current_count}")
-    logger.info(f"  New papers added: {new_paper_count}")
-
-    return True
+        return [period_name]
 
 
 def update_embeddings(csv_files_to_update):
-    """Update embeddings for the specified CSV files"""
+    """Update embeddings for the specified CSV files using efficient incremental updates."""
 
     if not csv_files_to_update:
         logger.info("All embeddings are up to date!")
@@ -234,133 +266,25 @@ def update_embeddings(csv_files_to_update):
 
     logger.info(f"\nWill update embeddings for: {', '.join(csv_files_to_update)}")
 
-    # Initialize updater
     updater = EmbeddingUpdater()
 
-    # Load existing metadata
     with open('../Embeddings/overall_metadata.json', 'r') as f:
         metadata = json.load(f)
 
-    # Track what we updated
+    # Load all papers once for consistent cross-file deduplication
+    df_all = load_all_papers(data_dir="../Data")
+    logger.info(f"Total papers after deduplication: {len(df_all)}")
+
+    # Efficient update for each changed period
     updated_embeddings = []
-
-    # Determine if only 2025s needs updating (common case for monthly updates)
-    if csv_files_to_update == ['2025s']:
-        # Use efficient update path for 2025s
-        if efficient_update_2025s(updater, metadata):
-            updated_embeddings.append('2025s')
-    else:
-        # Full regeneration required when multiple files changed or non-2025s files modified
-        logger.info("\nPerforming full regeneration (non-2025s files were modified)...")
-
-        # Load ALL papers together to handle cross-file duplicate removal properly
-        # This ensures consistency with how the app loads data
-        df_all = load_all_papers(data_dir="../Data")
-        logger.info(f"Total papers after duplicate removal: {len(df_all)}")
-
-        # Process each CSV file that needs updating
-        for csv_period in csv_files_to_update:
-            logger.info(f"\n{'='*60}")
-            logger.info(f"Updating {csv_period}...")
-            logger.info(f"{'='*60}")
-
-            if csv_period == 'b2000':
-                # Filter to b2000 papers from the full dataset
-                df_b2000 = df_all[df_all.year < 2000]
-
-                if len(df_b2000) == 0:
-                    logger.warning(f"No papers found for {csv_period}")
-                    continue
-
-                # Process papers maintaining the same split index as original generation
-                split_index = len(df_b2000) // 2
-
-                # Part 1
-                df_part1 = df_b2000.iloc[:split_index]
-                logger.info(f"\nUpdating embeddings_b2000_part1.npy ({len(df_part1)} papers)...")
-                embeddings_part1 = updater.create_embeddings(df_part1)
-                embeddings_part1_float16 = embeddings_part1.astype(np.float16)
-                np.save('../Embeddings/embeddings_b2000_part1.npy', embeddings_part1_float16)
-
-                file_size_part1 = os.path.getsize('../Embeddings/embeddings_b2000_part1.npy') / (1024 * 1024)
-                metadata['files']['b2000_part1'] = {
-                    'num_papers': len(df_part1),
-                    'file_size_mb': file_size_part1,
-                    'year_range': f'{df_part1.year.min()}-{df_part1.year.max()}',
-                    'index_range': f'0-{split_index-1} of b2000',
-                    'source_csv': 'papers_b2000.csv',
-                    'creation_date': datetime.now().isoformat()
-                }
-                updated_embeddings.append('b2000_part1')
-                logger.info(f"✓ Updated embeddings_b2000_part1.npy: {file_size_part1:.1f} MB")
-
-                # Part 2
-                df_part2 = df_b2000.iloc[split_index:]
-                logger.info(f"\nUpdating embeddings_b2000_part2.npy ({len(df_part2)} papers)...")
-                embeddings_part2 = updater.create_embeddings(df_part2)
-                embeddings_part2_float16 = embeddings_part2.astype(np.float16)
-                np.save('../Embeddings/embeddings_b2000_part2.npy', embeddings_part2_float16)
-
-                file_size_part2 = os.path.getsize('../Embeddings/embeddings_b2000_part2.npy') / (1024 * 1024)
-                metadata['files']['b2000_part2'] = {
-                    'num_papers': len(df_part2),
-                    'file_size_mb': file_size_part2,
-                    'year_range': f'{df_part2.year.min()}-{df_part2.year.max()}',
-                    'index_range': f'{split_index}-{len(df_b2000)-1} of b2000',
-                    'source_csv': 'papers_b2000.csv',
-                    'creation_date': datetime.now().isoformat()
-                }
-                updated_embeddings.append('b2000_part2')
-                logger.info(f"✓ Updated embeddings_b2000_part2.npy: {file_size_part2:.1f} MB")
-
-            else:
-                # Filter papers for this period from the full dataset
-                year_ranges = {
-                    '2000s': (2000, 2010),
-                    '2010s': (2010, 2015),
-                    '2015s': (2015, 2020),
-                    '2020s': (2020, 2025),
-                    '2025s': (2025, 3000)
-                }
-
-                if csv_period in year_ranges:
-                    year_start, year_end = year_ranges[csv_period]
-                    df_period = df_all[(df_all.year >= year_start) & (df_all.year < year_end)]
-
-                    if len(df_period) == 0:
-                        logger.warning(f"No papers found for {csv_period}")
-                        continue
-
-                    # The efficient path for 2025s applies even in full regeneration mode
-                    if csv_period == '2025s':
-                        # Still use efficient method if possible
-                        if efficient_update_2025s(updater, metadata):
-                            updated_embeddings.append('2025s')
-                        continue
-
-                    # Create embeddings for other periods
-                    embeddings = updater.create_embeddings(df_period)
-                    embeddings_float16 = embeddings.astype(np.float16)
-                    output_path = f'../Embeddings/embeddings_{csv_period}.npy'
-                    np.save(output_path, embeddings_float16)
-
-                    file_size = os.path.getsize(output_path) / (1024 * 1024)
-                    metadata['files'][csv_period] = {
-                        'num_papers': len(df_period),
-                        'file_size_mb': file_size,
-                        'year_range': f'{df_period.year.min()}-{df_period.year.max()}',
-                        'source_csv': f'papers_{csv_period}.csv',
-                        'creation_date': datetime.now().isoformat()
-                    }
-                    updated_embeddings.append(csv_period)
-                    logger.info(f"✓ Updated {output_path}: {file_size:.1f} MB")
+    for period in csv_files_to_update:
+        updated_embeddings.extend(efficient_update_period(updater, metadata, df_all, period))
 
     # Update totals
     metadata['total_papers'] = sum(f['num_papers'] for f in metadata['files'].values())
     metadata['total_size_mb'] = sum(f['file_size_mb'] for f in metadata['files'].values())
     metadata['last_update'] = datetime.now().isoformat()
 
-    # Save updated metadata
     with open('../Embeddings/overall_metadata.json', 'w') as f:
         json.dump(metadata, f, indent=2)
 
@@ -371,9 +295,6 @@ def update_embeddings(csv_files_to_update):
     logger.info(f"Updated embeddings: {', '.join(updated_embeddings)}")
     logger.info(f"Total papers: {metadata['total_papers']:,}")
     logger.info(f"Total size: {metadata['total_size_mb']:.1f} MB")
-
-    # Verify total count consistency between embeddings and papers
-    df_all = load_all_papers(data_dir="../Data")
     logger.info(f"Embeddings match app data: {metadata['total_papers'] == len(df_all)} ✓")
     logger.info(f"{'='*60}")
 
