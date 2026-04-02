@@ -3,7 +3,8 @@
     "allow": [
       "WebFetch(domain:docs.streamlit.io)",
       "Bash(sort:*)",
-      "WebFetch(domain:blog.streamlit.io)"
+      "WebFetch(domain:blog.streamlit.io)",
+      "Bash(python3:*)"
     ]
   }
 }
