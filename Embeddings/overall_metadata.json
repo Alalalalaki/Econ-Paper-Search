@@ -2,8 +2,8 @@
   "model_name": "sentence-transformers/all-MiniLM-L6-v2",
   "embedding_dim": 384,
   "creation_date": "2026-03-01T14:55:00.539985",
-  "last_update": "2026-07-09T00:26:28.417274",
-  "total_papers": 224110,
+  "last_update": "2026-08-01T21:33:30.814990",
+  "total_papers": 224752,
   "note": "b2000 embeddings are split by index (not year) to maintain order and stay under 50MB",
   "embedding_structure": [
     "b2000_part1",
@@ -53,21 +53,21 @@
       "creation_date": "2026-03-01T14:58:31.577692"
     },
     "2020s": {
-      "num_papers": 34227,
-      "file_size_mb": 25.0687255859375,
+      "num_papers": 34242,
+      "file_size_mb": 25.0797119140625,
       "year_range": "2020-2024",
       "source_csv": "papers_2020s.csv",
-      "creation_date": "2026-06-07T07:00:41.882057",
-      "papers_added": 26
+      "creation_date": "2026-08-01T21:33:29.443563",
+      "papers_added": 15
     },
     "2025s": {
-      "num_papers": 10990,
-      "file_size_mb": 8.0494384765625,
+      "num_papers": 11617,
+      "file_size_mb": 8.5086669921875,
       "year_range": "2025-2026",
       "source_csv": "papers_2025s.csv",
-      "creation_date": "2026-07-09T00:26:28.395103",
-      "papers_added": 792
+      "creation_date": "2026-08-01T21:33:30.791709",
+      "papers_added": 627
     }
   },
-  "total_size_mb": 164.1439208984375
+  "total_size_mb": 164.6141357421875
 }
